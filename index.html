@@ -7,35 +7,34 @@
     <style>
         :root {
             --drop-text: "Перетягніть стілець";
-            /* Стильна палітра: Monochrome + Soft Blue Accent */
-            --bg-body: #F9FAFB;
-            --bg-card: #FFFFFF;
-            --text-primary: #1F2937;
-            --text-secondary: #6B7280;
-            --accent: #2563EB; /* Royal Blue */
-            --border: #E5E7EB;
-            --success: #10B981;
-            --error: #EF4444;
-            --panel-bg: #111827; /* Dark panel */
-            
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --bg-color: #F7F7F5;
+            --card-bg: #FFFFFF;
+            --text-main: #37474F;
+            --text-secondary: #78909C;
+            --accent-color: #546E7A;
+            --btn-gradient: linear-gradient(135deg, #455A64 0%, #263238 100%);
+            --success-color: #66BB6A;
+            --error-color: #EF5350;
+            --panel-bg: #263238;
+            --shadow-soft: 0 4px 20px rgba(0,0,0,0.03);
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.05);
+            --radius-main: 12px;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-primary);
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            /* Важливо для скролу */
             overflow-x: hidden;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* --- HEADER --- */
@@ -43,38 +42,44 @@
             display: flex;
             flex-direction: column;
             padding: 20px 24px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
+            background: var(--bg-color);
             z-index: 10;
-            /* НЕ фіксований, скролиться разом зі сторінкою */
             position: relative; 
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         
         .header-top {
             display: flex;
             justify-content: flex-end;
+            align-items: center;
             width: 100%;
         }
         
         .header-desc {
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-secondary);
-            margin-top: 12px;
-            line-height: 1.6;
+            margin-top: 10px;
+            line-height: 1.5;
             max-width: 800px;
+            font-weight: 400;
         }
 
-        .lang-switch { font-size: 14px; font-weight: 600; cursor: pointer; color: #9CA3AF; transition: color 0.2s; pointer-events: auto; }
-        .lang-switch.active { color: var(--text-primary); text-decoration: underline; text-underline-offset: 4px; }
-        .lang-separator { margin: 0 8px; color: #E5E7EB; }
+        .lang-switch { 
+            font-size: 13px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            color: #B0BEC5; 
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+            pointer-events: auto; 
+        }
+        .lang-switch:hover { color: var(--text-main); }
+        .lang-switch.active { color: var(--text-main); text-decoration: none; border-bottom: 2px solid var(--text-main); padding-bottom: 2px;}
+        .lang-separator { margin: 0 10px; color: #CFD8DC; }
 
         /* --- VIEWS --- */
-        #game-view, #results-view { 
-            display: flex; 
-            flex-direction: column; 
-            flex: 1; 
-        }
-        #results-view { display: none; padding: 24px; padding-bottom: 100px; }
+        #game-view { display: flex; flex-direction: column; flex: 1; }
+        #results-view { display: none; flex-direction: column; flex: 1; padding: 24px; padding-bottom: 100px; }
 
         /* --- GAME GRID --- */
         #buildings-container {
@@ -82,20 +87,19 @@
             display: grid;
             padding: 24px;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 32px;
-            /* Місце під панель */
-            padding-bottom: 220px; 
+            gap: 30px;
+            padding-bottom: 250px; 
         }
 
         .card {
-            background: var(--bg-card);
+            background: var(--card-bg);
             display: flex;
             flex-direction: column;
             align-items: center;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-main);
+            box-shadow: var(--shadow-card);
             padding: 20px;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(0,0,0,0.02);
         }
 
         .building-img {
@@ -103,191 +107,254 @@
             aspect-ratio: 16 / 10;
             object-fit: cover;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             pointer-events: none;
             -webkit-user-drag: none;
-            background-color: #f3f4f6;
+            background-color: #ECEFF1;
+            filter: brightness(0.98);
         }
 
         .chair-drop-zone {
             height: 180px;
-            border: 2px dashed #D1D5DB;
+            border: 1px dashed #B0BEC5;
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #F9FAFB;
+            background-color: #FAFAFA;
             margin-bottom: 16px;
             position: relative;
             width: 100%;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
         .chair-drop-zone:not(.has-item)::after {
             content: var(--drop-text);
             position: absolute;
-            color: #9CA3AF;
-            font-size: 14px;
+            color: #CFD8DC;
+            font-size: 13px;
             pointer-events: none;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .chair-drop-zone.drag-over { background-color: #EFF6FF; border-color: var(--accent); }
-        .chair-drop-zone.has-item { border-style: solid; border-color: transparent; background-color: #fff; box-shadow: 0 0 0 1px var(--success); }
+        .chair-drop-zone.drag-over { 
+            background-color: rgba(84, 110, 122, 0.05); 
+            border-color: var(--accent-color); 
+        }
+        .chair-drop-zone.has-item { 
+            border-style: solid; 
+            border-color: transparent; 
+            background-color: #fff; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
 
         .style-input {
             padding: 12px;
-            border: 1px solid #D1D5DB;
-            border-radius: 8px;
-            font-size: 16px;
+            border: 1px solid #CFD8DC;
+            border-radius: 6px;
+            font-size: 15px;
             width: 100%;
             text-align: center;
             background: #fff;
-            color: var(--text-primary);
+            color: var(--text-main);
             -webkit-user-select: text;
             user-select: text;
+            transition: all 0.2s;
             outline: none;
-            transition: border-color 0.2s;
         }
-        .style-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .style-input:focus {
+            border-color: var(--accent-color);
+            background: #fff;
+        }
 
-        /* --- BUTTONS & FOOTER --- */
+        /* --- SUBMIT BUTTON --- */
         #submit-container {
             grid-column: 1 / -1;
             display: flex;
             justify-content: center;
             margin-top: 40px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             width: 100%;
         }
         .action-btn {
-            background-color: var(--text-primary);
+            background: var(--btn-gradient);
             color: white;
             border: none;
-            padding: 16px 40px;
-            font-size: 16px;
-            border-radius: 100px;
+            padding: 14px 32px;
+            font-size: 15px;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 4px 15px rgba(55, 71, 79, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
             pointer-events: auto;
+            text-align: center;
             font-weight: 600;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
+            -webkit-appearance: none;
+        }
+        .action-btn:hover { 
+            transform: translateY(-1px); 
+            box-shadow: 0 6px 20px rgba(55, 71, 79, 0.3); 
         }
         .action-btn:active { transform: scale(0.98); }
-        .action-btn:hover { background-color: #000; }
 
         #footer-game {
             grid-column: 1 / -1;
             text-align: right;
-            color: #9CA3AF;
-            font-size: 12px;
+            color: #B0BEC5;
+            font-size: 11px;
             margin-top: 10px;
+            padding-right: 10px;
             font-weight: 500;
+            width: 100%;
         }
 
-        /* --- CHAIRS POOL --- */
+        /* --- POOL (Compact Modern Drawer) --- */
         #chairs-pool {
             position: fixed;
             bottom: 0; left: 0; width: 100%; 
-            height: 200px; /* Desktop height */
+            /* Висота підлаштована під нові розміри (160 + відступи) */
+            height: 190px; 
             background-color: var(--panel-bg);
-            padding-top: 20px; 
-            padding-bottom: 20px;
+            /* ПРАВКА: Мінімальні поля */
+            padding-top: 10px; 
+            padding-bottom: 10px;
             display: flex; align-items: flex-start;
             overflow-x: auto; z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            scrollbar-width: thin;
+            scrollbar-color: #546E7A var(--panel-bg);
         }
         
         .chair-item {
-            min-width: 130px; width: 130px; height: 130px;
-            margin: 0 12px; 
+            /* ПРАВКА: Збільшено на 25% (130 -> 162) */
+            min-width: 162px; width: 162px; height: 162px;
+            margin: 0 10px; 
             cursor: grab; 
             background: #fff; 
             border-radius: 8px; 
-            padding: 8px;
-            object-fit: contain; box-sizing: border-box; pointer-events: auto;
-            transition: transform 0.2s;
+            padding: 5px;
+            object-fit: contain; 
+            box-sizing: border-box; 
+            pointer-events: auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-        .chair-item:hover { transform: translateY(-5px); }
+        .chair-item:active { cursor: grabbing; transform: scale(0.95); }
         
         .chair-item.dragging-mobile {
-            position: fixed; z-index: 9999; opacity: 0.9; pointer-events: none;
-            width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent);
-            background: #fff; transform: translate(-50%, -50%); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            position: fixed; z-index: 9999; opacity: 0.95; pointer-events: none;
+            width: 140px; height: 140px; border-radius: 50%; 
+            border: 2px solid var(--accent-color);
+            background: #fff; 
+            transform: translate(-50%, -50%); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        /* --- RESULTS --- */
+        /* --- RESULTS STYLES --- */
         .score-card {
-            background: #fff; padding: 40px; border-radius: 16px;
-            text-align: center; margin-bottom: 40px;
-            box-shadow: var(--shadow);
-            border-top: 6px solid var(--text-primary);
+            background: #fff; padding: 32px; border-radius: 16px;
+            text-align: center; margin-bottom: 30px;
+            box-shadow: var(--shadow-soft);
+            border-top: 4px solid var(--accent-color);
         }
-        .score-title { font-size: 48px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px; letter-spacing: -1px; }
-        .score-text { font-size: 18px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
-        /* Емодзі */
-        .score-emoji { font-size: 32px; margin-bottom: 30px; letter-spacing: 8px; }
+        .score-card.mobile-only {
+            display: none; 
+            margin-top: 20px;
+        }
+
+        .score-title { font-size: 36px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.5px; }
+        .score-text { font-size: 16px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .score-emojis { font-size: 28px; margin-bottom: 24px; letter-spacing: 5px; }
 
         .result-item {
-            background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px;
-            border: 1px solid var(--border); display: flex; flex-direction: column;
+            background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 24px;
+            box-shadow: var(--shadow-card);
+            border-left: 4px solid transparent;
         }
-        .result-item.correct { border-left: 4px solid var(--success); background-color: #F0FDF4; }
-        .result-item.incorrect { border-left: 4px solid var(--error); background-color: #FEF2F2; }
+        .result-item.correct { border-left-color: var(--success-color); }
+        .result-item.incorrect { border-left-color: var(--error-color); }
         
-        .result-header { font-weight: 700; font-size: 18px; margin-bottom: 16px; color: var(--text-primary); }
+        .result-header { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text-main); }
         
         .result-grid {
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;
             align-items: end;
         }
-        .res-img-block { text-align: center; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        
+        .res-img-block { text-align: center; font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;}
+        .res-img-block div:last-child { margin-top: 6px; }
+
+        /* ПРАВКА: Стільці у відповідях збільшено (160 -> 240) */
         .res-img { 
-            width: auto; height: 160px; max-width: 100%;
-            object-fit: contain; background: #fff; border-radius: 6px; 
-            border: 1px solid #E5E7EB; padding: 4px; display: block; margin: 0 auto 8px auto;
+            width: auto; height: 240px; max-width: 100%;
+            object-fit: contain; background: #fff; border-radius: 4px; 
+            border: 1px solid #ECEFF1; padding: 4px; display: block; margin: 0 auto;
         }
         .b-img { width: 100%; height: auto; aspect-ratio: 16/10; object-fit: cover; border: none; padding: 0; }
         
-        .user-input-display { margin-bottom: 12px; font-size: 14px; color: var(--text-primary); }
-        .result-details { font-size: 14px; line-height: 1.6; color: var(--text-secondary); border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;}
-        .result-details b { color: var(--text-primary); }
+        .result-details { font-size: 14px; line-height: 1.6; color: var(--text-main); border-top: 1px solid #ECEFF1; padding-top: 12px;}
+        .result-details b { color: var(--accent-color); font-weight: 600; }
+        .user-input-display { font-style: italic; color: var(--text-secondary); margin-bottom: 8px; font-size: 13px;}
 
-        /* --- MOBILE TWEAKS --- */
+        /* --- MOBILE ADAPTATION --- */
         @media (max-width: 600px) {
             #buildings-container { 
-                padding: 0; gap: 0; display: block; 
-                padding-bottom: 150px !important; /* Менше, бо панель менша */
+                padding: 0; 
+                gap: 0; 
+                display: block; 
+                padding-bottom: 150px !important; 
             }
             
             .card { 
-                border-radius: 0; border: none; box-shadow: none; 
-                margin-bottom: 0; width: 100%; padding: 0 0 40px 0; 
-                border-bottom: 12px solid #F3F4F6; /* Розділювач */
+                border-radius: 0; 
+                border: none;
+                box-shadow: none; 
+                margin-bottom: 0; 
+                width: 100%; 
+                padding: 0 0 40px 0; 
+                background: #fff;
             }
-            .building-img { border-radius: 0; margin-bottom: 24px; }
-            .chair-drop-zone, .style-input { width: 90%; margin: 0 auto 16px auto; }
+            .card + .card { 
+                border-top: 12px solid #ECEFF1; 
+            }
             
-            /* Footer centering */
-            #footer-game { text-align: center; padding: 20px; margin-top: 0; }
+            .building-img { 
+                border-radius: 0; 
+                margin-bottom: 24px; 
+                width: 100%; 
+                box-shadow: none; 
+            }
+            
+            .chair-drop-zone, .style-input { 
+                width: 90%; 
+                margin: 0 auto 16px auto; 
+            }
+            
+            .result-grid { grid-template-columns: 1fr; gap: 20px; }
+            .res-img { height: 200px; } /* На мобільному трохи менше 240, щоб влізло */
+            .b-img { width: 100%; aspect-ratio: 16/10; height: auto;}
+            
+            #footer-game { text-align: center; padding-right: 0; margin-bottom: 20px; margin-top: 20px;} 
+            
+            #header { padding: 15px 20px; }
+            .header-desc { font-size: 13px; }
 
-            /* Компактна панель стільців */
+            /* ПРАВКА: Тонка панель на мобільному */
             #chairs-pool {
-                height: 140px; /* Зменшено */
-                padding-top: 15px;
-                padding-bottom: 15px; /* Мінімальне поле знизу */
+                height: 130px; /* Висота під картинки */
+                padding-top: 5px; /* Мінімум відступу */
+                padding-bottom: 5px;
             }
+            
             .chair-item {
-                /* Розмір не змінюємо, лише відступи */
-                margin: 0 8px;
-                /* Якщо треба, трохи менше ніж на десктопі, але зручно */
-                min-width: 110px; width: 110px; height: 110px; 
+                /* ПРАВКА: Розмір +25% відносно старого мобільного (90 -> 115) */
+                min-width: 115px; width: 115px; height: 115px; 
+                margin: 5px;
             }
 
-            /* Результати в колонку */
-            .result-grid { grid-template-columns: 1fr; gap: 24px; }
-            .res-img { height: 160px; }
-            .b-img { width: 100%; height: auto; }
+            .score-card.mobile-only {
+                display: block;
+            }
         }
     </style>
 </head>
@@ -322,11 +389,19 @@
         <div class="score-card">
             <div class="score-title" id="score-val">0 / 16</div>
             <div class="score-text" id="score-msg">...</div>
-            <div class="score-emoji" id="score-emoji"></div>
+            <div class="score-emojis" id="score-emojis"></div>
             <button class="action-btn" onclick="resetGame()" id="retry-btn">Пройти ще раз</button>
         </div>
+        
         <div id="results-list">
             </div>
+
+        <div class="score-card mobile-only">
+            <div class="score-title" id="score-val-bottom">0 / 16</div>
+            <div class="score-text" id="score-msg-bottom">...</div>
+            <div class="score-emojis" id="score-emojis-bottom"></div>
+            <button class="action-btn" onclick="resetGame()" id="retry-btn-bottom">Пройти ще раз</button>
+        </div>
     </div>
 
     <script>
@@ -337,76 +412,91 @@
               archEN: "Albrechtsburg Castle. Meissen, Germany, 1471–1500. Architect: Arnold von Westfalen",
               chairUA: "Крісло з різьбленого дуба. Шотландія, близько 1540 року", 
               chairEN: "Carved oak chair. Scotland, circa 1540" },
+            
             { id: 2, styleUA: "Ренесанс", styleEN: "Renaissance", 
               archUA: "Вілла Фарнезіна. Рим, 1506-1510 роки. Архітектор: Бальдассаре Перуцці", 
               archEN: "Villa Farnesina. Rome, 1506-1510. Architect: Baldassare Peruzzi",
               chairUA: "Крісло з різьбленого дуба. Італія близько 1550 року", 
               chairEN: "Carved oak chair. Italy, circa 1550" },
+            
             { id: 3, styleUA: "Бароко", styleEN: "Baroque", 
               archUA: "Замок Во-ле-Віконт. Мельон, Франція, 1658-1661 роки. Архітектор: Луї Лево", 
               archEN: "Château de Vaux-le-Vicomte. Maincy, France, 1658-1661. Architect: Louis Le Vau",
               chairUA: "Крісло з різьбленого горіха з оксамитовою оббивкою. Венеція, близько 1685-1710 років", 
               chairEN: "Carved walnut armchair with velvet upholstery. Venice, circa 1685-1710" },
+
             { id: 4, styleUA: "Рококо", styleEN: "Rococo", 
               archUA: "Павільйон Амалієнбург. Німфенбург, Німеччина 1734–1739 роки. Архітектор: Франсуа Кювільє", 
               archEN: "Amalienburg. Nymphenburg, Germany 1734–1739. Architect: François de Cuvilliés",
               chairUA: "Крісло з різьбленого бука з шовковою оббивкою. Париж, перша половина XVIII ст", 
               chairEN: "Carved beech armchair with silk upholstery. Paris, first half of the 18th century" },
+
             { id: 5, styleUA: "Неокласицизм", styleEN: "Neoclassicism", 
               archUA: "Кедлстон-хол, Дербішир, Великобританія, 1759-1762 роки. Архітектори: Джеймс Пейн, Метью Бреттінгем, Роберт Адам", 
               archEN: "Kedleston Hall, Derbyshire, UK, 1759-1762. Architects: James Paine, Matthew Brettingham, Robert Adam",
               chairUA: "Крісло з різьбленої берези із позолоченням та шовковою оббивкою. Франція близько 1780 року. Робота Жоржа Жакоба", 
               chairEN: "Gilt carved birch armchair with silk upholstery. France c. 1780. By Georges Jacob" },
+
             { id: 6, styleUA: "Ампір", styleEN: "Empire", 
               archUA: "Церква Сен-Мадлен, Париж, Франція, 1807-28 роки. Архітектор: П'єр-Олександр Віньон", 
               archEN: "La Madeleine, Paris, France, 1807-28. Architect: Pierre-Alexandre Vignon",
               chairUA: "Крісло з різьбленого горіха із позолоченням та оксамитовою оббивкою. Рим, близько 1800-1805 років", 
               chairEN: "Gilt carved walnut armchair with velvet upholstery. Rome, circa 1800-1805" },
+
             { id: 7, styleUA: "Національний романтизм", styleEN: "National Romanticism", 
               archUA: "Вілла під ялинами. Закопане, Польща, 1897 рік. Архітектор: Станіслав Віткевич", 
               archEN: "Villa Pod Jedlami. Zakopane, Poland, 1897. Architect: Stanisław Witkiewicz",
               chairUA: "Стілець із колекції Koti. Фінляндія, 1903 рік. Дизайн Еліеля Саарінена", 
               chairEN: "Chair from the Koti collection. Finland, 1903. Design by Eliel Saarinen" },
+
             { id: 8, styleUA: "Ар-нуво", styleEN: "Art Nouveau", 
               archUA: "Вілла Мажореля. Нансі, Франція, 1901-1902 роки. Архітектор: Анрі Саваж", 
               archEN: "Villa Majorelle. Nancy, France, 1901-1902. Architect: Henri Sauvage",
               chairUA: "Крісло з різьбленого горіха із сатиновою оббивкою. Нансі, Франція, близько 1899-1900 років. Робота Луї Мажореля", 
               chairEN: "Carved walnut armchair with satin upholstery. Nancy, France, circa 1899-1900. By Louis Majorelle" },
+
             { id: 9, styleUA: "Український архітектурний модерн", styleEN: "Ukrainian Architectural Modern", 
               archUA: "Будинок Полтавського губернського земства, Полтава, 1903–1908 роки. Архітектор: Василь Кричевський", 
               archEN: "Poltava Governorate Zemstvo building, Poltava, 1903–1908. Architect: Vasyl Krychevsky",
               chairUA: "Стілець Полтавського кустарного виробництва. Полтава, близько 1910-ті роки. Дизайн Володимира Черченко", 
               chairEN: "Chair of Poltava handicraft production. Poltava, circa 1910s. Design by Volodymyr Cherchenko" },
+
             { id: 10, styleUA: "Ар-деко", styleEN: "Art Deco", 
               archUA: "Вілла Ампан. Брюссель, 1930–1934 роки. Архітектор: Мішель Полак", 
               archEN: "Villa Empain. Brussels, 1930–1934. Architect: Michel Polak",
               chairUA: "Крісло із чорного дерева. Франція, близько 1929-1930 років. Дизайн Еміля Жака Рульманна", 
               chairEN: "Ebony armchair. France, circa 1929-1930. Design by Émile-Jacques Ruhlmann" },
+
             { id: 11, styleUA: "Ранній модернізм", styleEN: "Early Modernism", 
               archUA: "Вілла Савуа. Пуассі, Франція, 1928-1931 роки. Архітектор: Ле Корбюзьє", 
               archEN: "Villa Savoye. Poissy, France, 1928-1931. Architect: Le Corbusier",
               chairUA: "Стілець Wassily зі шкіри та металу. 1925 рік. Дизайн Марселя Бройєра", 
               chairEN: "Wassily chair made of leather and metal. 1925. Design by Marcel Breuer" },
+
             { id: 12, styleUA: "Пізній модернізм", styleEN: "Late Modernism", 
               archUA: "Резиденція канцлера ФРН. Бонн, Німеччина, 1963-1966 роки. Архітектор: Зеп Руф", 
               archEN: "Chancellor's Bungalow. Bonn, Germany, 1963-1966. Architect: Sep Ruf",
               chairUA: "Крісло GE-240 Cigar з тику та дуба зі знімними подушками. Данія, 1950-ті роки. Дизайн Ханса Вегнера", 
               chairEN: "GE-240 Cigar armchair in teak and oak. Denmark, 1950s. Design by Hans Wegner" },
+
             { id: 13, styleUA: "Ретрофутуризм", styleEN: "Retro-futurism", 
               archUA: "Серійний пластиковий будинок Futuro. Фінляндія, проєкт 1968 року. Архітектор: Матті Сууронен", 
               archEN: "Futuro plastic house. Finland, 1968 project. Architect: Matti Suuronen",
               chairUA: "Крісло Ball із алюмінію з текстильною оббивкою. 1973 рік. Дизайн Ееро Аарніо", 
               chairEN: "Ball Chair made of aluminum with textile upholstery. 1973. Design by Eero Aarnio" },
+
             { id: 14, styleUA: "Хай-тек", styleEN: "High-tech", 
               archUA: "ЖК «Альбіон Ріверсайд». Лондон, Великобританія, 2003 рік. Архітектор: Норман Фостер", 
               archEN: "Albion Riverside. London, UK, 2003. Architect: Norman Foster",
               chairUA: "Стілець DS-718 з металу та шкіри. Швейцарія Дизайн Клаудіо Белліні. Виробляється компанією De Sede", 
               chairEN: "DS-718 chair made of metal and leather. Switzerland. Design by Claudio Bellini. Produced by De Sede" },
+
             { id: 15, styleUA: "Постмодернізм", styleEN: "Postmodernism", 
               archUA: "Виноградники Clos Pegase. Каліфорнія, 1984-1987 роки. Архітектор: Майкл Грейвс", 
               archEN: "Clos Pegase Winery. California, 1984-1987. Architect: Michael Graves",
               chairUA: "Крісло Proust із різьбленого дерева з текстильною оббивкою. 1978 рік. Дизайн Алессандро Мендіні. Виробляється компанією Cappellini", 
               chairEN: "Proust armchair made of carved wood with textile upholstery. 1978. Design by Alessandro Mendini. Produced by Cappellini" },
+
             { id: 16, styleUA: "Деконструктивізм", styleEN: "Deconstructivism", 
               archUA: "«Танцювальний будинок». Прага, 1992-1996 роки. Архітектор: Френк Гері", 
               archEN: "Dancing House. Prague, 1992-1996. Architect: Frank Gehry",
@@ -466,7 +556,9 @@
             document.querySelectorAll('.style-input').forEach(inp => inp.placeholder = t.placeholder);
             document.getElementById('submit-btn').innerText = t.submitBtn;
             document.getElementById('footer-game').innerText = t.footer;
+            
             document.getElementById('retry-btn').innerText = t.retry;
+            document.getElementById('retry-btn-bottom').innerText = t.retry;
 
             document.getElementById('btn-ua').classList.toggle('active', lang === 'ua');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
@@ -476,10 +568,8 @@
         function initGame() {
             const container = document.getElementById('buildings-container');
             const submitContainer = document.getElementById('submit-container');
-            const footerGame = document.getElementById('footer-game');
             const pool = document.getElementById('chairs-pool');
             
-            // Чистимо тільки картки, залишаємо кнопку та футер
             Array.from(container.children).forEach(child => {
                 if(child.id !== 'submit-container' && child.id !== 'footer-game') container.removeChild(child);
             });
@@ -580,14 +670,13 @@
                     <div class="result-grid">
                         <div class="res-img-block">
                             <img src="a${i}.jpg" class="res-img b-img">
-                            <div>${t.labels.arch}</div>
-                        </div>
+                            </div>
                         <div class="res-img-block">
                             <img src="c${i}.png" class="res-img">
                             <div>${t.labels.correct}</div>
                         </div>
                         <div class="res-img-block">
-                            <div style="width:auto; height:160px; display:flex; align-items:center; justify-content:center; margin: 0 auto 8px auto;">
+                            <div style="width:auto; height:240px; display:flex; align-items:center; justify-content:center; margin: 0 auto 8px auto;">
                                 ${userChairSrc ? `<img src="${userChairSrc}" class="res-img">` : `<span style="color:#D1D5DB; font-size:24px; border:1px dashed #D1D5DB; border-radius:6px; width:80px; height:80px; display:flex; align-items:center; justify-content:center;">?</span>`}
                             </div>
                             <div>${t.labels.yourChoice}</div>
@@ -615,7 +704,11 @@
 
             document.getElementById('score-val').innerText = `${score} / 16`;
             document.getElementById('score-msg').innerText = finalMsg;
-            document.getElementById('score-emoji').innerText = finalEmoji;
+            document.getElementById('score-emojis').innerText = finalEmoji;
+            
+            document.getElementById('score-val-bottom').innerText = `${score} / 16`;
+            document.getElementById('score-msg-bottom').innerText = finalMsg;
+            document.getElementById('score-emojis-bottom').innerText = finalEmoji;
             
             document.getElementById('game-view').style.display = 'none';
             document.getElementById('results-view').style.display = 'flex';

@@ -7,17 +7,24 @@
     <style>
         :root {
             --drop-text: "Перетягніть стілець";
-            --bg-color: #f7f9fc;
-            --card-bg: #ffffff;
-            --text-main: #2c3e50;
-            --text-secondary: #7f8c8d;
-            --accent-color: #2196f3;
-            --success-color: #2ecc71;
-            --error-color: #e74c3c;
-            --panel-bg: #1e1e24;
-            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
-            --shadow-hover: 0 15px 35px rgba(0,0,0,0.1);
-            --radius-main: 16px;
+            
+            /* --- НОВА КОЛЬОРОВА ГАМА (Gallery Theme) --- */
+            --bg-color: #F7F7F5; /* Теплий світло-сірий (камінь) */
+            --card-bg: #FFFFFF;
+            --text-main: #37474F; /* Глибокий грифельний */
+            --text-secondary: #78909C; /* М'який сіро-блакитний */
+            
+            --accent-color: #546E7A; /* Стриманий синьо-сірий для акцентів */
+            --btn-gradient: linear-gradient(135deg, #455A64 0%, #263238 100%);
+            
+            --success-color: #66BB6A; /* Приглушений зелений */
+            --error-color: #EF5350;   /* Приглушений червоний */
+            
+            --panel-bg: #263238;      /* Темний фон для панелі стільців */
+            
+            --shadow-soft: 0 4px 20px rgba(0,0,0,0.03);
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.05);
+            --radius-main: 12px;
         }
 
         body {
@@ -37,17 +44,16 @@
         }
 
         /* --- HEADER --- */
+        /* ПРАВКА: position: relative, щоб він скролився разом зі сторінкою */
         #header {
             display: flex;
             flex-direction: column;
             padding: 20px 24px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+            background: var(--bg-color); /* Фон як у сторінки, щоб менше виділявся */
             z-index: 500;
             flex-shrink: 0;
-            position: sticky;
-            top: 0;
+            position: relative; 
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         
         .header-top {
@@ -58,9 +64,9 @@
         }
         
         .header-desc {
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-secondary);
-            margin-top: 12px;
+            margin-top: 10px;
             line-height: 1.5;
             max-width: 800px;
             font-weight: 400;
@@ -70,14 +76,14 @@
             font-size: 13px; 
             font-weight: 600; 
             cursor: pointer; 
-            color: #b0b8bf; 
+            color: #B0BEC5; 
             letter-spacing: 0.5px;
             transition: color 0.2s;
             pointer-events: auto; 
         }
         .lang-switch:hover { color: var(--text-main); }
         .lang-switch.active { color: var(--text-main); text-decoration: none; border-bottom: 2px solid var(--text-main); padding-bottom: 2px;}
-        .lang-separator { margin: 0 10px; color: #e0e0e0; }
+        .lang-separator { margin: 0 10px; color: #CFD8DC; }
 
         /* --- VIEWS --- */
         #game-view { display: flex; flex-direction: column; height: 100%; }
@@ -91,8 +97,8 @@
             display: grid;
             padding: 24px;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 24px;
-            padding-bottom: 300px; /* Space for drawer */
+            gap: 30px; /* Більший простір між картками */
+            padding-bottom: 200px; /* Місце під тонку панель */
         }
 
         .card {
@@ -101,39 +107,31 @@
             flex-direction: column;
             align-items: center;
             border-radius: var(--radius-main);
-            box-shadow: var(--shadow-soft);
+            box-shadow: var(--shadow-card);
             padding: 20px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-
-        /* Hover effect mainly for desktop */
-        @media (hover: hover) {
-            .card:hover {
-                transform: translateY(-2px);
-                box-shadow: var(--shadow-hover);
-            }
+            border: 1px solid rgba(0,0,0,0.02);
         }
 
         .building-img {
             width: 100%;
             aspect-ratio: 16 / 10;
             object-fit: cover;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 16px;
             pointer-events: none;
             -webkit-user-drag: none;
-            background-color: #eee; /* Placeholder color */
+            background-color: #ECEFF1;
+            filter: brightness(0.98); /* Трохи приглушуємо яскравість фото для стилю */
         }
 
         .chair-drop-zone {
             height: 180px;
-            border: 2px dashed #e0e0e0; /* Softer dashed line */
-            border-radius: 12px;
+            border: 1px dashed #B0BEC5; /* Тонша, делікатна рамка */
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #fafbfd;
+            background-color: #FAFAFA;
             margin-bottom: 16px;
             position: relative;
             width: 100%;
@@ -142,42 +140,41 @@
         .chair-drop-zone:not(.has-item)::after {
             content: var(--drop-text);
             position: absolute;
-            color: #bdc3c7;
-            font-size: 14px;
+            color: #CFD8DC;
+            font-size: 13px;
             pointer-events: none;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .chair-drop-zone.drag-over { 
-            background-color: rgba(33, 150, 243, 0.05); 
+            background-color: rgba(84, 110, 122, 0.05); 
             border-color: var(--accent-color); 
-            transform: scale(1.01);
         }
         .chair-drop-zone.has-item { 
             border-style: solid; 
             border-color: transparent; 
             background-color: #fff; 
-            box-shadow: inset 0 0 0 2px var(--success-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .style-input {
-            padding: 14px;
-            border: 1px solid #edf2f7;
-            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #CFD8DC;
+            border-radius: 6px;
             font-size: 15px;
             width: 100%;
             text-align: center;
-            background: #f8fafc;
+            background: #fff;
             color: var(--text-main);
             -webkit-user-select: text;
             user-select: text;
             transition: all 0.2s;
             outline: none;
-            font-family: inherit;
         }
         .style-input:focus {
-            background: #fff;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            background: #fff;
         }
 
         /* --- SUBMIT BUTTON --- */
@@ -189,14 +186,14 @@
             margin-bottom: 20px;
         }
         .action-btn {
-            background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+            background: var(--btn-gradient);
             color: white;
             border: none;
-            padding: 16px 36px;
-            font-size: 16px;
+            padding: 14px 32px;
+            font-size: 15px;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 15px rgba(55, 71, 79, 0.2);
             transition: transform 0.2s, box-shadow 0.2s;
             pointer-events: auto;
             text-align: center;
@@ -205,93 +202,95 @@
             text-transform: uppercase;
         }
         .action-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.25); 
+            transform: translateY(-1px); 
+            box-shadow: 0 6px 20px rgba(55, 71, 79, 0.3); 
         }
         .action-btn:active { transform: scale(0.98); }
 
         #footer-game {
             grid-column: 1 / -1;
             text-align: right;
-            color: #bdc3c7;
+            color: #B0BEC5;
             font-size: 11px;
             margin-top: 10px;
             padding-right: 10px;
             font-weight: 500;
         }
 
-        /* --- POOL (Modern Drawer) --- */
+        /* --- POOL (Compact Modern Drawer) --- */
         #chairs-pool {
             position: fixed;
-            bottom: 0; left: 0; width: 100%; height: 230px;
+            bottom: 0; left: 0; width: 100%; 
+            /* ПРАВКА: Значно менша висота */
+            height: 160px; 
             background-color: var(--panel-bg);
-            padding-top: 25px; 
-            padding-bottom: 20px;
+            /* ПРАВКА: Мінімальні відступи */
+            padding-top: 15px; 
+            padding-bottom: 10px;
             display: flex; align-items: flex-start;
             overflow-x: auto; z-index: 1000;
             
-            /* Modern styling */
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            /* Тонкий скрол */
+            scrollbar-width: thin;
+            scrollbar-color: #546E7A var(--panel-bg);
         }
         
-        /* Drawer Handle */
+        /* Ручка для краси */
         #chairs-pool::before {
             content: "";
             position: fixed;
-            bottom: 210px; /* Adjust based on height */
+            bottom: 150px; /* Підлаштовано під висоту */
             left: 50%;
             transform: translateX(-50%);
-            width: 40px;
-            height: 4px;
-            background-color: rgba(255,255,255,0.2);
-            border-radius: 4px;
+            width: 30px;
+            height: 3px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 3px;
             pointer-events: none;
         }
 
         .chair-item {
-            min-width: 120px; width: 120px; height: 120px;
-            margin: 10px 12px; 
+            /* ПРАВКА: Менші розміри стільців у стрічці */
+            min-width: 100px; width: 100px; height: 100px;
+            margin: 5px 8px; 
             cursor: grab; 
             background: #fff; 
-            border-radius: 16px; 
-            padding: 8px;
+            border-radius: 8px; 
+            padding: 5px;
             object-fit: contain; 
             box-sizing: border-box; 
             pointer-events: auto;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .chair-item:active { cursor: grabbing; transform: scale(0.95); }
         
         .chair-item.dragging-mobile {
             position: fixed; z-index: 9999; opacity: 0.95; pointer-events: none;
             width: 110px; height: 110px; border-radius: 50%; 
-            border: 3px solid var(--accent-color);
+            border: 2px solid var(--accent-color);
             background: #fff; 
             transform: translate(-50%, -50%); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         /* --- RESULTS STYLES --- */
         .score-card {
-            background: #fff; padding: 32px; border-radius: 24px;
+            background: #fff; padding: 32px; border-radius: 16px;
             text-align: center; margin-bottom: 30px;
             box-shadow: var(--shadow-soft);
-            border-bottom: 4px solid var(--accent-color);
+            border-top: 4px solid var(--accent-color);
         }
-        .score-title { font-size: 42px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -1px; }
-        .score-text { font-size: 16px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+        .score-title { font-size: 36px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.5px; }
+        .score-text { font-size: 16px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px; }
 
         .result-item {
-            background: #fff; border-radius: 16px; padding: 20px; margin-bottom: 24px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid transparent;
-            transition: border-color 0.3s;
+            background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 24px;
+            box-shadow: var(--shadow-card);
+            border-left: 4px solid transparent;
         }
-        .result-item.correct { border-color: var(--success-color); background: linear-gradient(to bottom right, #fff, #f0fdf4); }
-        .result-item.incorrect { border-color: var(--error-color); background: linear-gradient(to bottom right, #fff, #fef2f2); }
+        .result-item.correct { border-left-color: var(--success-color); }
+        .result-item.incorrect { border-left-color: var(--error-color); }
         
         .result-header { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text-main); }
         
@@ -299,49 +298,68 @@
             display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;
             align-items: end;
         }
-        .res-img-block { text-align: center; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
+        .res-img-block { text-align: center; font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;}
         .res-img-block div:last-child { margin-top: 6px; }
 
         .res-img { 
             width: auto; height: 160px; max-width: 100%;
-            object-fit: contain; background: #fff; border-radius: 8px; 
-            border: 1px solid #e0e0e0; padding: 4px; display: block; margin: 0 auto;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            object-fit: contain; background: #fff; border-radius: 4px; 
+            border: 1px solid #ECEFF1; padding: 4px; display: block; margin: 0 auto;
         }
-        .b-img { width: 100%; height: auto; aspect-ratio: 16/10; object-fit: cover; border: none; padding: 0; box-shadow: none;}
+        .b-img { width: 100%; height: auto; aspect-ratio: 16/10; object-fit: cover; border: none; padding: 0; }
         
-        .result-details { font-size: 14px; line-height: 1.7; color: var(--text-secondary); border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;}
-        .result-details b { color: var(--text-main); font-weight: 600; }
-        .user-input-display { font-style: italic; color: var(--text-main); margin-bottom: 8px; background: rgba(0,0,0,0.03); display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 13px;}
+        .result-details { font-size: 14px; line-height: 1.6; color: var(--text-main); border-top: 1px solid #ECEFF1; padding-top: 12px;}
+        .result-details b { color: var(--accent-color); font-weight: 600; }
+        .user-input-display { font-style: italic; color: var(--text-secondary); margin-bottom: 8px; font-size: 13px;}
 
         /* --- MOBILE ADAPTATION --- */
         @media (max-width: 600px) {
-            #buildings-container { padding: 0; gap: 0; display: block; padding-bottom: 400px !important; }
+            #buildings-container { 
+                padding: 0; 
+                gap: 0; 
+                display: block; 
+                padding-bottom: 150px !important; /* Підлаштовано під нову висоту панелі */
+            }
             
             .card { 
                 border-radius: 0; 
                 border: none;
-                border-bottom: 1px solid #e0e0e0; 
                 box-shadow: none; 
                 margin-bottom: 0; 
                 width: 100%; 
-                padding: 0 0 32px 0; 
+                /* ПРАВКА: Більше повітря і простору всередині картки */
+                padding: 30px 20px 40px 20px; 
                 background: #fff;
             }
-            /* Add a thicker separator between cards */
-            .card + .card { margin-top: 10px; border-top: 1px solid #e0e0e0; }
+            /* ПРАВКА: Помітний розділювач між блоками */
+            .card + .card { 
+                border-top: 12px solid #ECEFF1; 
+            }
             
-            .building-img { border-radius: 0; margin-bottom: 24px; width: 100%; }
-            .chair-drop-zone, .style-input { width: 90%; margin: 0 auto 16px auto; }
+            .building-img { border-radius: 0; margin-bottom: 24px; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+            .chair-drop-zone, .style-input { width: 100%; margin: 0 auto 16px auto; }
             
             .result-grid { grid-template-columns: 1fr; gap: 20px; }
             .res-img { height: 160px; } 
             .b-img { width: 100%; aspect-ratio: 16/10; height: auto;}
             
-            #footer-game { text-align: center; padding-right: 0; margin-bottom: 20px;} 
+            #footer-game { text-align: center; padding-right: 0; margin-bottom: 20px; margin-top: 20px;} 
             
-            #header { padding: 15px; }
-            .header-desc { font-size: 14px; }
+            #header { padding: 15px 20px; }
+            .header-desc { font-size: 13px; }
+
+            /* ПРАВКА: Супер тонка панель на мобільному */
+            #chairs-pool {
+                height: 130px; /* Дуже компактно */
+                padding-top: 10px;
+                padding-bottom: 5px;
+            }
+            #chairs-pool::before { display: none; } /* Прибираємо ручку на мобільному для економії місця */
+            
+            .chair-item {
+                min-width: 90px; width: 90px; height: 90px; /* Менші картинки */
+                margin: 5px;
+            }
         }
     </style>
 </head>

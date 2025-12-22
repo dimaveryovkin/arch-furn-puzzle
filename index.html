@@ -3,242 +3,604 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Архітектурна головоломка</title>
+    <title>Стильна головоломка</title>
     <style>
+        :root {
+            --drop-text: "Перетягніть стілець";
+            --bg-color: #f7f9fc;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --accent-color: #2196f3;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --panel-bg: #1e1e24;
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
+            --shadow-hover: 0 15px 35px rgba(0,0,0,0.1);
+            --radius-main: 16px;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow-x: hidden;
-            
-            /* ЗАХИСТ: Глобальна заборона виділення */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* --- ВЕРХНЯ ЧАСТИНА: СІТКА БУДІВЕЛЬ --- */
+        /* --- HEADER --- */
+        #header {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+            z-index: 500;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .header-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            line-height: 1.5;
+            max-width: 800px;
+            font-weight: 400;
+        }
+
+        .lang-switch { 
+            font-size: 13px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            color: #b0b8bf; 
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+            pointer-events: auto; 
+        }
+        .lang-switch:hover { color: var(--text-main); }
+        .lang-switch.active { color: var(--text-main); text-decoration: none; border-bottom: 2px solid var(--text-main); padding-bottom: 2px;}
+        .lang-separator { margin: 0 10px; color: #e0e0e0; }
+
+        /* --- VIEWS --- */
+        #game-view { display: flex; flex-direction: column; height: 100%; }
+        #results-view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding: 24px; padding-bottom: 100px; }
+
+        /* --- GAME GRID --- */
         #buildings-container {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
             display: grid;
-            
-            /* DESKTOP */
-            padding: 20px;
+            padding: 24px;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-            padding-bottom: 250px; 
+            gap: 24px;
+            padding-bottom: 300px; /* Space for drawer */
         }
 
         .card {
-            background: white;
+            background: var(--card-bg);
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* DESKTOP */
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            padding: 15px;
+            border-radius: var(--radius-main);
+            box-shadow: var(--shadow-soft);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        /* Hover effect mainly for desktop */
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-hover);
+            }
         }
 
         .building-img {
             width: 100%;
             aspect-ratio: 16 / 10;
             object-fit: cover;
-            /* DESKTOP */
-            border-radius: 8px;
-            margin-bottom: 15px;
-            
+            border-radius: 12px;
+            margin-bottom: 16px;
             pointer-events: none;
             -webkit-user-drag: none;
+            background-color: #eee; /* Placeholder color */
         }
 
         .chair-drop-zone {
             height: 180px;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
+            border: 2px dashed #e0e0e0; /* Softer dashed line */
+            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s, border-color 0.3s;
-            background-color: #fafafa;
-            margin-bottom: 15px;
+            background-color: #fafbfd;
+            margin-bottom: 16px;
             position: relative;
             width: 100%;
+            transition: all 0.3s ease;
+        }
+        .chair-drop-zone:not(.has-item)::after {
+            content: var(--drop-text);
+            position: absolute;
+            color: #bdc3c7;
+            font-size: 14px;
+            pointer-events: none;
+            font-weight: 500;
+        }
+        .chair-drop-zone.drag-over { 
+            background-color: rgba(33, 150, 243, 0.05); 
+            border-color: var(--accent-color); 
+            transform: scale(1.01);
+        }
+        .chair-drop-zone.has-item { 
+            border-style: solid; 
+            border-color: transparent; 
+            background-color: #fff; 
+            box-shadow: inset 0 0 0 2px var(--success-color);
         }
 
         .style-input {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
+            padding: 14px;
+            border: 1px solid #edf2f7;
+            border-radius: 10px;
+            font-size: 15px;
+            width: 100%;
             text-align: center;
-            background-color: #f9f9f9;
+            background: #f8fafc;
+            color: var(--text-main);
             -webkit-user-select: text;
             user-select: text;
-            width: 100%;
-        }
-
-        /* --- MOBILE ADAPTATION --- */
-        @media (max-width: 600px) {
-            #buildings-container {
-                padding: 0; 
-                gap: 0;
-                display: block; 
-                padding-bottom: 350px !important; 
-            }
-
-            .card {
-                border-radius: 0;
-                box-shadow: none;
-                border-bottom: 15px solid #e1e4e8;
-                padding: 0;
-                padding-bottom: 25px;
-                margin-bottom: 0;
-                width: 100%;
-            }
-
-            .building-img {
-                border-radius: 0;
-                margin-bottom: 20px;
-                width: 100%;
-            }
-
-            .chair-drop-zone, .style-input {
-                width: 92%;
-                margin-left: auto;
-                margin-right: auto;
-            }
-        }
-
-        .chair-drop-zone.drag-over {
-            background-color: #e3f2fd;
-            border-color: #2196f3;
-        }
-        .chair-drop-zone.has-item {
-            border-style: solid;
-            border-color: #4caf50;
-            background-color: #fff;
+            transition: all 0.2s;
+            outline: none;
+            font-family: inherit;
         }
         .style-input:focus {
-            outline: none;
-            border-color: #2196f3;
-            background-color: #fff;
+            background: #fff;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
         }
 
-        /* --- НИЖНЯ ЧАСТИНА: ПУЛ КРІСЕЛ --- */
+        /* --- SUBMIT BUTTON --- */
+        #submit-container {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        .action-btn {
+            background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+            pointer-events: auto;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .action-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25); 
+        }
+        .action-btn:active { transform: scale(0.98); }
+
+        #footer-game {
+            grid-column: 1 / -1;
+            text-align: right;
+            color: #bdc3c7;
+            font-size: 11px;
+            margin-top: 10px;
+            padding-right: 10px;
+            font-weight: 500;
+        }
+
+        /* --- POOL (Modern Drawer) --- */
         #chairs-pool {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 220px; 
+            bottom: 0; left: 0; width: 100%; height: 230px;
+            background-color: var(--panel-bg);
+            padding-top: 25px; 
+            padding-bottom: 20px;
+            display: flex; align-items: flex-start;
+            overflow-x: auto; z-index: 1000;
             
-            /* Дизайн панелі */
-            background-color: #222;
-            
-            /* Відступи */
-            padding-top: 30px; /* Місце для "ручки" */
-            padding-bottom: 10px;
-            
-            display: flex;
-            align-items: flex-start;
-            
-            overflow-x: auto; 
-            z-index: 1000;
-            box-sizing: border-box;
-            
-            /* Внутрішня тінь з боків, щоб натякнути на прокрутку */
-            box-shadow: inset 15px 0 15px -15px rgba(0,0,0,0.8), 
-                        inset -15px 0 15px -15px rgba(0,0,0,0.8),
-                        0 -5px 15px rgba(0,0,0,0.2); 
+            /* Modern styling */
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
         }
-
-        /* ДИЗАЙН: "GRIP HANDLE" (Ручка захоплення) */
+        
+        /* Drawer Handle */
         #chairs-pool::before {
             content: "";
-            position: fixed; /* Фіксуємо, щоб не скролилась */
-            bottom: 200px; /* Позиція зверху панелі */
+            position: fixed;
+            bottom: 210px; /* Adjust based on height */
             left: 50%;
             transform: translateX(-50%);
-            
-            /* Вигляд "пігулки" */
-            width: 50px;
-            height: 5px;
-            background-color: #555; /* Темно-сірий колір */
-            border-radius: 10px;
-            
+            width: 40px;
+            height: 4px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 4px;
             pointer-events: none;
-            opacity: 0.8;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
         .chair-item {
-            width: 130px;
-            height: 130px;
-            min-width: 130px;
-            margin: 0 10px;
-            /* Відступ зверху, щоб не перекривати "ручку" */
-            margin-top: 10px; 
-            
-            cursor: grab;
-            background-color: white;
-            border-radius: 8px;
-            padding: 5px;
-            box-sizing: border-box;
-            object-fit: contain;
-            
+            min-width: 120px; width: 120px; height: 120px;
+            margin: 10px 12px; 
+            cursor: grab; 
+            background: #fff; 
+            border-radius: 16px; 
+            padding: 8px;
+            object-fit: contain; 
+            box-sizing: border-box; 
             pointer-events: auto;
-            -webkit-touch-callout: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
         }
+        .chair-item:active { cursor: grabbing; transform: scale(0.95); }
         
         .chair-item.dragging-mobile {
-            position: fixed;
-            z-index: 9999;
-            opacity: 0.9;
-            pointer-events: none;
-            width: 120px;
-            height: 120px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 2px solid #2196f3;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.9);
-            transform: translate(-50%, -50%);
+            position: fixed; z-index: 9999; opacity: 0.95; pointer-events: none;
+            width: 110px; height: 110px; border-radius: 50%; 
+            border: 3px solid var(--accent-color);
+            background: #fff; 
+            transform: translate(-50%, -50%); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
-        #chairs-pool::-webkit-scrollbar {
-            height: 6px; /* Тонший скрол */
+        /* --- RESULTS STYLES --- */
+        .score-card {
+            background: #fff; padding: 32px; border-radius: 24px;
+            text-align: center; margin-bottom: 30px;
+            box-shadow: var(--shadow-soft);
+            border-bottom: 4px solid var(--accent-color);
         }
-        #chairs-pool::-webkit-scrollbar-track {
-            background: #222;
+        .score-title { font-size: 42px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -1px; }
+        .score-text { font-size: 16px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+
+        .result-item {
+            background: #fff; border-radius: 16px; padding: 20px; margin-bottom: 24px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid transparent;
+            transition: border-color 0.3s;
         }
-        #chairs-pool::-webkit-scrollbar-thumb {
-            background: #444; 
-            border-radius: 3px;
+        .result-item.correct { border-color: var(--success-color); background: linear-gradient(to bottom right, #fff, #f0fdf4); }
+        .result-item.incorrect { border-color: var(--error-color); background: linear-gradient(to bottom right, #fff, #fef2f2); }
+        
+        .result-header { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text-main); }
+        
+        .result-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;
+            align-items: end;
+        }
+        .res-img-block { text-align: center; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
+        .res-img-block div:last-child { margin-top: 6px; }
+
+        .res-img { 
+            width: auto; height: 160px; max-width: 100%;
+            object-fit: contain; background: #fff; border-radius: 8px; 
+            border: 1px solid #e0e0e0; padding: 4px; display: block; margin: 0 auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .b-img { width: 100%; height: auto; aspect-ratio: 16/10; object-fit: cover; border: none; padding: 0; box-shadow: none;}
+        
+        .result-details { font-size: 14px; line-height: 1.7; color: var(--text-secondary); border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;}
+        .result-details b { color: var(--text-main); font-weight: 600; }
+        .user-input-display { font-style: italic; color: var(--text-main); margin-bottom: 8px; background: rgba(0,0,0,0.03); display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 13px;}
+
+        /* --- MOBILE ADAPTATION --- */
+        @media (max-width: 600px) {
+            #buildings-container { padding: 0; gap: 0; display: block; padding-bottom: 400px !important; }
+            
+            .card { 
+                border-radius: 0; 
+                border: none;
+                border-bottom: 1px solid #e0e0e0; 
+                box-shadow: none; 
+                margin-bottom: 0; 
+                width: 100%; 
+                padding: 0 0 32px 0; 
+                background: #fff;
+            }
+            /* Add a thicker separator between cards */
+            .card + .card { margin-top: 10px; border-top: 1px solid #e0e0e0; }
+            
+            .building-img { border-radius: 0; margin-bottom: 24px; width: 100%; }
+            .chair-drop-zone, .style-input { width: 90%; margin: 0 auto 16px auto; }
+            
+            .result-grid { grid-template-columns: 1fr; gap: 20px; }
+            .res-img { height: 160px; } 
+            .b-img { width: 100%; aspect-ratio: 16/10; height: auto;}
+            
+            #footer-game { text-align: center; padding-right: 0; margin-bottom: 20px;} 
+            
+            #header { padding: 15px; }
+            .header-desc { font-size: 14px; }
         }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="buildings-container"></div>
+    <div id="header">
+        <div class="header-top">
+            <div>
+                <span class="lang-switch active" id="btn-ua" onclick="setLanguage('ua')">UA</span>
+                <span class="lang-separator">|</span>
+                <span class="lang-switch" id="btn-en" onclick="setLanguage('en')">EN</span>
+            </div>
+        </div>
+        <div class="header-desc" id="page-desc">
+            Раніше, якщо ви плутали бароко та модерн, Таня одразу втрачала інтерес до вас. Тепер вимоги не такі сурові, проте краще не розслаблятись.
+        </div>
+    </div>
 
-    <div id="chairs-pool" ondrop="dropToPool(event)" ondragover="allowDrop(event)"></div>
+    <div id="game-view">
+        <div id="buildings-container">
+            <div id="submit-container">
+                <button class="action-btn" onclick="checkResults()" id="submit-btn">Чи вартий/а я уваги Тані</button>
+            </div>
+            <div id="footer-game">Зроблено на основі давньої головоломки від arzamas</div>
+        </div>
+        <div id="chairs-pool" ondrop="dropToPool(event)" ondragover="allowDrop(event)">
+            </div>
+    </div>
+
+    <div id="results-view">
+        <div class="score-card">
+            <div class="score-title" id="score-val">0 / 16</div>
+            <div class="score-text" id="score-msg">...</div>
+            <button class="action-btn" onclick="resetGame()" id="retry-btn">Пройти ще раз</button>
+        </div>
+        <div id="results-list">
+            </div>
+    </div>
 
     <script>
-        // --- ДАНІ ---
-        const totalItems = 16;
-        const buildingsData = [];
-        const chairsData = [];
+        // --- DATASET ---
+        const gameDB = [
+            { id: 1, styleUA: "Готика", styleEN: "Gothic", 
+              archUA: "Замок Альбрехтсбург. Майсен, Німеччина, 1471–1500 роки. Архітектор: Арнольд фон Вестфален", 
+              archEN: "Albrechtsburg Castle. Meissen, Germany, 1471–1500. Architect: Arnold von Westfalen",
+              chairUA: "Крісло з різьбленого дуба. Шотландія, близько 1540 року", 
+              chairEN: "Carved oak chair. Scotland, circa 1540" },
+            
+            { id: 2, styleUA: "Ренесанс", styleEN: "Renaissance", 
+              archUA: "Вілла Фарнезіна. Рим, 1506-1510 роки. Архітектор: Бальдассаре Перуцці", 
+              archEN: "Villa Farnesina. Rome, 1506-1510. Architect: Baldassare Peruzzi",
+              chairUA: "Крісло з різьбленого дуба. Італія близько 1550 року", 
+              chairEN: "Carved oak chair. Italy, circa 1550" },
+            
+            { id: 3, styleUA: "Бароко", styleEN: "Baroque", 
+              archUA: "Замок Во-ле-Віконт. Мельон, Франція, 1658-1661 роки. Архітектор: Луї Лево", 
+              archEN: "Château de Vaux-le-Vicomte. Maincy, France, 1658-1661. Architect: Louis Le Vau",
+              chairUA: "Крісло з різьбленого горіха з оксамитовою оббивкою. Венеція, близько 1685-1710 років", 
+              chairEN: "Carved walnut armchair with velvet upholstery. Venice, circa 1685-1710" },
 
-        for (let i = 1; i <= totalItems; i++) {
-            buildingsData.push({ id: `A${i}`, src: `a${i}.jpg`, code: `A${i}` });
-            chairsData.push({ id: `C${i}`, src: `c${i}.png`, code: `C${i}` });
+            { id: 4, styleUA: "Рококо", styleEN: "Rococo", 
+              archUA: "Павільйон Амалієнбург. Німфенбург, Німеччина 1734–1739 роки. Архітектор: Франсуа Кювільє", 
+              archEN: "Amalienburg. Nymphenburg, Germany 1734–1739. Architect: François de Cuvilliés",
+              chairUA: "Крісло з різьбленого бука з шовковою оббивкою. Париж, перша половина XVIII ст", 
+              chairEN: "Carved beech armchair with silk upholstery. Paris, first half of the 18th century" },
+
+            { id: 5, styleUA: "Неокласицизм", styleEN: "Neoclassicism", 
+              archUA: "Кедлстон-хол, Дербішир, Великобританія, 1759-1762 роки. Архітектори: Джеймс Пейн, Метью Бреттінгем, Роберт Адам", 
+              archEN: "Kedleston Hall, Derbyshire, UK, 1759-1762. Architects: James Paine, Matthew Brettingham, Robert Adam",
+              chairUA: "Крісло з різьбленої берези із позолоченням та шовковою оббивкою. Франція близько 1780 року. Робота Жоржа Жакоба", 
+              chairEN: "Gilt carved birch armchair with silk upholstery. France c. 1780. By Georges Jacob" },
+
+            { id: 6, styleUA: "Ампір", styleEN: "Empire", 
+              archUA: "Церква Сен-Мадлен, Париж, Франція, 1807-28 роки. Архітектор: П'єр-Олександр Віньон", 
+              archEN: "La Madeleine, Paris, France, 1807-28. Architect: Pierre-Alexandre Vignon",
+              chairUA: "Крісло з різьбленого горіха із позолоченням та оксамитовою оббивкою. Рим, близько 1800-1805 років", 
+              chairEN: "Gilt carved walnut armchair with velvet upholstery. Rome, circa 1800-1805" },
+
+            { id: 7, styleUA: "Національний романтизм", styleEN: "National Romanticism", 
+              archUA: "Вілла під ялинами. Закопане, Польща, 1897 рік. Архітектор: Станіслав Віткевич", 
+              archEN: "Villa Pod Jedlami (Villa under the Firs). Zakopane, Poland, 1897. Architect: Stanisław Witkiewicz",
+              chairUA: "Стілець із колекції Koti. Фінляндія, 1903 рік. Дизайн Еліеля Саарінена", 
+              chairEN: "Chair from the Koti collection. Finland, 1903. Design by Eliel Saarinen" },
+
+            { id: 8, styleUA: "Ар-нуво", styleEN: "Art Nouveau", 
+              archUA: "Вілла Мажореля. Нансі, Франція, 1901-1902 роки. Архітектор: Анрі Саваж", 
+              archEN: "Villa Majorelle. Nancy, France, 1901-1902. Architect: Henri Sauvage",
+              chairUA: "Крісло з різьбленого горіха із сатиновою оббивкою. Нансі, Франція, близько 1899-1900 років. Робота Луї Мажореля", 
+              chairEN: "Carved walnut armchair with satin upholstery. Nancy, France, circa 1899-1900. By Louis Majorelle" },
+
+            { id: 9, styleUA: "Український архітектурний модерн", styleEN: "Ukrainian Architectural Modern", 
+              archUA: "Будинок Полтавського губернського земства, Полтава, 1903–1908 роки. Архітектор: Василь Кричевський", 
+              archEN: "Poltava Governorate Zemstvo building, Poltava, 1903–1908. Architect: Vasyl Krychevsky",
+              chairUA: "Стілець Полтавського кустарного виробництва. Полтава, близько 1910-ті роки. Дизайн Володимира Черченко", 
+              chairEN: "Chair of Poltava handicraft production. Poltava, circa 1910s. Design by Volodymyr Cherchenko" },
+
+            { id: 10, styleUA: "Ар-деко", styleEN: "Art Deco", 
+              archUA: "Вілла Ампан. Брюссель, 1930–1934 роки. Архітектор: Мішель Полак", 
+              archEN: "Villa Empain. Brussels, 1930–1934. Architect: Michel Polak",
+              chairUA: "Крісло із чорного дерева. Франція, близько 1929-1930 років. Дизайн Еміля Жака Рульманна", 
+              chairEN: "Ebony armchair. France, circa 1929-1930. Design by Émile-Jacques Ruhlmann" },
+
+            { id: 11, styleUA: "Ранній модернізм", styleEN: "Early Modernism", 
+              archUA: "Вілла Савуа. Пуассі, Франція, 1928-1931 роки. Архітектор: Ле Корбюзьє", 
+              archEN: "Villa Savoye. Poissy, France, 1928-1931. Architect: Le Corbusier",
+              chairUA: "Стілець Wassily зі шкіри та металу. 1925 рік. Дизайн Марселя Бройєра", 
+              chairEN: "Wassily chair made of leather and metal. 1925. Design by Marcel Breuer" },
+
+            { id: 12, styleUA: "Пізній модернізм", styleEN: "Late Modernism", 
+              archUA: "Резиденція канцлера ФРН. Бонн, Німеччина, 1963-1966 роки. Архітектор: Зеп Руф", 
+              archEN: "Chancellor's Bungalow. Bonn, Germany, 1963-1966. Architect: Sep Ruf",
+              chairUA: "Крісло GE-240 Cigar з тику та дуба зі знімними подушками. Данія, 1950-ті роки. Дизайн Ханса Вегнера", 
+              chairEN: "GE-240 Cigar armchair in teak and oak. Denmark, 1950s. Design by Hans Wegner" },
+
+            { id: 13, styleUA: "Ретрофутуризм", styleEN: "Retro-futurism", 
+              archUA: "Серійний пластиковий будинок Futuro. Фінляндія, проєкт 1968 року. Архітектор: Матті Сууронен", 
+              archEN: "Futuro plastic house. Finland, 1968 project. Architect: Matti Suuronen",
+              chairUA: "Крісло Ball із алюмінію з текстильною оббивкою. 1973 рік. Дизайн Ееро Аарніо", 
+              chairEN: "Ball Chair made of aluminum with textile upholstery. 1973. Design by Eero Aarnio" },
+
+            { id: 14, styleUA: "Хай-тек", styleEN: "High-tech", 
+              archUA: "ЖК «Альбіон Ріверсайд». Лондон, Великобританія, 2003 рік. Архітектор: Норман Фостер", 
+              archEN: "Albion Riverside. London, UK, 2003. Architect: Norman Foster",
+              chairUA: "Стілець DS-718 з металу та шкіри. Швейцарія Дизайн Клаудіо Белліні. Виробляється компанією De Sede", 
+              chairEN: "DS-718 chair made of metal and leather. Switzerland. Design by Claudio Bellini. Produced by De Sede" },
+
+            { id: 15, styleUA: "Постмодернізм", styleEN: "Postmodernism", 
+              archUA: "Виноградники Clos Pegase. Каліфорнія, 1984-1987 роки. Архітектор: Майкл Грейвс", 
+              archEN: "Clos Pegase Winery. California, 1984-1987. Architect: Michael Graves",
+              chairUA: "Крісло Proust із різьбленого дерева з текстильною оббивкою. 1978 рік. Дизайн Алессандро Мендіні. Виробляється компанією Cappellini", 
+              chairEN: "Proust armchair made of carved wood with textile upholstery. 1978. Design by Alessandro Mendini. Produced by Cappellini" },
+
+            { id: 16, styleUA: "Деконструктивізм", styleEN: "Deconstructivism", 
+              archUA: "«Танцювальний будинок». Прага, 1992-1996 роки. Архітектор: Френк Гері", 
+              archEN: "Dancing House. Prague, 1992-1996. Architect: Frank Gehry",
+              chairUA: "Стілець Z-chair із металу. Італія, 2011 рік. Дизайн Захі Хадід. Виробляється компанією Sawaya & Moroni", 
+              chairEN: "Z-chair made of metal. Italy, 2011. Design by Zaha Hadid. Produced by Sawaya & Moroni" }
+        ];
+
+        // --- TRANSLATION CONFIG ---
+        const translations = {
+            ua: {
+                browserTitle: "Стильна головоломка",
+                desc: "Раніше, якщо ви плутали бароко та модерн, Таня одразу втрачала інтерес до вас. Тепер вимоги не такі сурові, проте краще не розслаблятись.",
+                placeholder: "Вкажіть стиль",
+                dropText: "Перетягніть стілець",
+                submitBtn: "Чи вартий/а я уваги Тані",
+                footer: "Зроблено на основі давньої головоломки від arzamas",
+                retry: "Пройти ще раз",
+                resTitle: "Результат",
+                labels: { correct: "Правильно", yourChoice: "Ваш вибір", yourStyle: "Ваш стиль", style: "Стиль", arch: "Архітектура", chair: "Стілець" },
+                scores: [
+                    { max: 5, text: "Вибачте, у вас немає жодних шансів з Танею" },
+                    { max: 10, text: "Є мізерний шанс, що ви зацікавите Таню" },
+                    { max: 14, text: "Ще трохи підтягнутись і ви гідні уваги Тетяни" },
+                    { max: 16, text: "Таня готова піти з вами на побачення" }
+                ]
+            },
+            en: {
+                browserTitle: "Stylish Puzzle",
+                desc: "Previously, if you confused Baroque and Modernism, Tanya would immediately lose interest in you. Now the requirements are not so strict, but better not to relax.",
+                placeholder: "Specify style",
+                dropText: "Drag chair here",
+                submitBtn: "Am I worthy of Tanya's attention?",
+                footer: "Based on an old puzzle by arzamas",
+                retry: "Try again",
+                resTitle: "Result",
+                labels: { correct: "Correct", yourChoice: "Your choice", yourStyle: "Your style", style: "Style", arch: "Architecture", chair: "Chair" },
+                scores: [
+                    { max: 5, text: "Sorry, you have no chance with Tanya" },
+                    { max: 10, text: "There is a tiny chance you might interest Tanya" },
+                    { max: 14, text: "A little more effort and you are worthy of Tanya's attention" },
+                    { max: 16, text: "Tanya is ready to go on a date with you" }
+                ]
+            }
+        };
+
+        let currentLang = 'ua';
+        let shuffledBuildings = []; 
+
+        // --- INIT & LANGUAGE ---
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            
+            document.title = t.browserTitle;
+            document.getElementById('page-desc').innerText = t.desc;
+            document.documentElement.style.setProperty('--drop-text', `"${t.dropText}"`);
+            
+            document.querySelectorAll('.style-input').forEach(inp => inp.placeholder = t.placeholder);
+            document.getElementById('submit-btn').innerText = t.submitBtn;
+            document.getElementById('footer-game').innerText = t.footer;
+            document.getElementById('retry-btn').innerText = t.retry;
+
+            document.getElementById('btn-ua').classList.toggle('active', lang === 'ua');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        }
+
+        // --- GAME GENERATION ---
+        function initGame() {
+            const container = document.getElementById('buildings-container');
+            const submitContainer = document.getElementById('submit-container');
+            const pool = document.getElementById('chairs-pool');
+            
+            Array.from(container.children).forEach(child => {
+                if(child.id !== 'submit-container' && child.id !== 'footer-game') container.removeChild(child);
+            });
+            pool.innerHTML = '';
+
+            let indices = Array.from({length: 16}, (_, i) => i + 1);
+            
+            shuffledBuildings = [...indices]; 
+            shuffleArray(shuffledBuildings);
+            
+            let shuffledChairs = [...indices];
+            shuffleArray(shuffledChairs);
+
+            // Buildings
+            shuffledBuildings.forEach(id => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                const img = document.createElement('img');
+                img.src = `a${id}.jpg`;
+                img.className = 'building-img';
+                
+                const zone = document.createElement('div');
+                zone.className = 'chair-drop-zone';
+                zone.id = `zone-A${id}`; 
+                zone.ondrop = (e) => drop(e, zone);
+                zone.ondragover = allowDrop;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'style-input';
+                input.id = `input-A${id}`;
+                input.placeholder = translations[currentLang].placeholder;
+
+                card.appendChild(img);
+                card.appendChild(zone);
+                card.appendChild(input);
+                
+                container.insertBefore(card, submitContainer);
+            });
+
+            // Chairs
+            shuffledChairs.forEach(id => {
+                const img = document.createElement('img');
+                img.src = `c${id}.png`;
+                img.id = `C${id}`;
+                img.className = 'chair-item';
+                img.draggable = true;
+                img.ondragstart = drag;
+                img.addEventListener('touchstart', handleTouchStart, {passive: false});
+                img.addEventListener('touchmove', handleTouchMove, {passive: false});
+                img.addEventListener('touchend', handleTouchEnd);
+                
+                pool.appendChild(img);
+            });
         }
 
         function shuffleArray(array) {
@@ -248,77 +610,102 @@
             }
         }
 
-        shuffleArray(buildingsData);
-        shuffleArray(chairsData);
+        // --- RESULTS LOGIC ---
+        function checkResults() {
+            let score = 0;
+            const resultsList = document.getElementById('results-list');
+            resultsList.innerHTML = '';
+            const t = translations[currentLang];
 
-        // --- ГЕНЕРАЦІЯ HTML ---
-        const buildingsContainer = document.getElementById('buildings-container');
-        const chairsPool = document.getElementById('chairs-pool');
+            // 1 to 16 Chronological
+            for (let i = 1; i <= 16; i++) {
+                const zone = document.getElementById(`zone-A${i}`);
+                const input = document.getElementById(`input-A${i}`);
+                const db = gameDB.find(item => item.id === i);
 
-        // Будівлі
-        buildingsData.forEach(building => {
-            const card = document.createElement('div');
-            card.className = 'card';
+                let userChairSrc = null;
+                let isCorrect = false;
+
+                if (zone.children.length > 0) {
+                    const chairId = zone.children[0].id; 
+                    userChairSrc = zone.children[0].src;
+                    
+                    if (chairId === `C${i}`) {
+                        isCorrect = true;
+                        score++;
+                    }
+                }
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `result-item ${isCorrect ? 'correct' : 'incorrect'}`;
+
+                const styleName = currentLang === 'ua' ? db.styleUA : db.styleEN;
+                const archDesc = currentLang === 'ua' ? db.archUA : db.archEN;
+                const chairDesc = currentLang === 'ua' ? db.chairUA : db.chairEN;
+
+                const userText = input.value.trim() || "—";
+
+                itemDiv.innerHTML = `
+                    <div class="result-header">${styleName}</div>
+                    <div class="result-grid">
+                        <div class="res-img-block">
+                            <img src="a${i}.jpg" class="res-img b-img">
+                            <div>${t.labels.arch}</div>
+                        </div>
+                        <div class="res-img-block">
+                            <img src="c${i}.png" class="res-img">
+                            <div>${t.labels.correct}</div>
+                        </div>
+                        <div class="res-img-block">
+                            <div style="width:auto; height:160px; display:flex; align-items:center; justify-content:center; margin: 0 auto;">
+                                ${userChairSrc ? `<img src="${userChairSrc}" class="res-img">` : `<span style="color:#bdc3c7; font-size:20px; border:1px dashed #d0d7de; border-radius:8px; width:100px; height:100px; display:flex; align-items:center; justify-content:center;">?</span>`}
+                            </div>
+                            <div>${t.labels.yourChoice}</div>
+                        </div>
+                    </div>
+                    <div class="user-input-display">${t.labels.yourStyle}: <b>${userText}</b></div>
+                    <div class="result-details">
+                        <b>${t.labels.style}:</b> ${styleName}<br>
+                        <b>${t.labels.arch}:</b> ${archDesc}<br>
+                        <b>${t.labels.chair}:</b> ${chairDesc}
+                    </div>
+                `;
+                resultsList.appendChild(itemDiv);
+            }
+
+            let finalMsg = "";
+            for (let s of t.scores) {
+                if (score <= s.max) {
+                    finalMsg = s.text;
+                    break;
+                }
+            }
+
+            document.getElementById('score-val').innerText = `${score} / 16`;
+            document.getElementById('score-msg').innerText = finalMsg;
             
-            const img = document.createElement('img');
-            img.src = building.src;
-            img.className = 'building-img';
-            img.alt = '';
-            img.onerror = function() { this.style.display = 'none'; };
-
-            const dropZone = document.createElement('div');
-            dropZone.className = 'chair-drop-zone';
-            dropZone.id = `zone-${building.id}`;
-            dropZone.ondrop = (event) => drop(event, dropZone);
-            dropZone.ondragover = allowDrop;
-
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'style-input';
-            input.placeholder = "Вкажіть стиль, якщо знаєте";
-
-            card.appendChild(img);
-            card.appendChild(dropZone);
-            card.appendChild(input);
-            buildingsContainer.appendChild(card);
-        });
-
-        // Крісла
-        chairsData.forEach(chair => {
-            const img = document.createElement('img');
-            img.src = chair.src;
-            img.id = chair.id;
-            img.className = 'chair-item';
-            img.draggable = true;
-            img.alt = ''; 
+            document.getElementById('game-view').style.display = 'none';
+            document.getElementById('results-view').style.display = 'flex';
             
-            img.ondragstart = drag;
-            img.oncontextmenu = function() { return false; };
-            img.onerror = function() { this.style.display = 'none'; };
+            window.scrollTo(0,0);
+        }
 
-            // Mobile Touch Events
-            img.addEventListener('touchstart', handleTouchStart, {passive: false});
-            img.addEventListener('touchmove', handleTouchMove, {passive: false});
-            img.addEventListener('touchend', handleTouchEnd);
-            
-            chairsPool.appendChild(img);
-        });
+        function resetGame() {
+            document.getElementById('results-view').style.display = 'none';
+            document.getElementById('game-view').style.display = 'flex';
+            initGame();
+        }
 
-        // --- ЛОГІКА DESKTOP ---
+        // --- DRAG & DROP LOGIC ---
         function allowDrop(ev) {
             ev.preventDefault();
-            if (ev.target.classList.contains('chair-drop-zone')) {
-                ev.target.classList.add('drag-over');
-            }
+            if (ev.target.classList.contains('chair-drop-zone')) ev.target.classList.add('drag-over');
         }
         document.addEventListener('dragleave', (ev) => {
-            if (ev.target.classList.contains('chair-drop-zone')) {
-                ev.target.classList.remove('drag-over');
-            }
+            if (ev.target.classList.contains('chair-drop-zone')) ev.target.classList.remove('drag-over');
         });
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
-        }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        
         function drop(ev, zone) {
             ev.preventDefault();
             zone.classList.remove('drag-over');
@@ -334,102 +721,77 @@
             if (draggedElement) returnToPool(draggedElement);
         }
 
-        // --- ЛОГІКА MOBILE ---
+        // --- MOBILE TOUCH LOGIC ---
         let touchDragItem = null;
         let originalParent = null;
-        let startX = 0;
-        let startY = 0;
+        let startX = 0, startY = 0;
 
         function handleTouchStart(e) {
             touchDragItem = e.target;
             originalParent = touchDragItem.parentElement;
-            const touch = e.touches[0];
-            startX = touch.clientX;
-            startY = touch.clientY;
+            const t = e.touches[0];
+            startX = t.clientX; startY = t.clientY;
         }
 
         function handleTouchMove(e) {
             if (!touchDragItem) return;
-            const touch = e.touches[0];
-            const diffX = Math.abs(touch.clientX - startX);
-            const diffY = Math.abs(touch.clientY - startY);
+            const t = e.touches[0];
+            const dx = Math.abs(t.clientX - startX);
+            const dy = Math.abs(t.clientY - startY);
 
             if (!touchDragItem.classList.contains('dragging-mobile')) {
-                if (originalParent.id === 'chairs-pool' && diffX > diffY) {
-                    return; // Це горизонтальний скрол
-                }
-                if (diffY > 5) { // Вертикальний рух = перетягування
+                if (originalParent.id === 'chairs-pool' && dx > dy) return;
+                if (dy > 5) {
                     touchDragItem.classList.add('dragging-mobile');
                     document.body.appendChild(touchDragItem);
                 }
             }
-
             if (touchDragItem.classList.contains('dragging-mobile')) {
                 e.preventDefault();
-                touchDragItem.style.left = touch.clientX + 'px';
-                touchDragItem.style.top = touch.clientY + 'px';
+                touchDragItem.style.left = t.clientX + 'px';
+                touchDragItem.style.top = t.clientY + 'px';
             }
         }
 
         function handleTouchEnd(e) {
             if (!touchDragItem) return;
-            
-            if (!touchDragItem.classList.contains('dragging-mobile')) {
-                touchDragItem = null;
-                return;
-            }
+            if (!touchDragItem.classList.contains('dragging-mobile')) { touchDragItem = null; return; }
 
-            const touch = e.changedTouches[0];
+            const t = e.changedTouches[0];
             touchDragItem.style.display = 'none';
-            let elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            let el = document.elementFromPoint(t.clientX, t.clientY);
             touchDragItem.style.display = 'block';
 
-            let dropZone = elementBelow ? elementBelow.closest('.chair-drop-zone') : null;
-            let poolZone = elementBelow ? elementBelow.closest('#chairs-pool') : null;
+            let dropZone = el ? el.closest('.chair-drop-zone') : null;
+            let poolZone = el ? el.closest('#chairs-pool') : null;
 
             touchDragItem.classList.remove('dragging-mobile');
-            touchDragItem.style.left = '';
-            touchDragItem.style.top = '';
-            touchDragItem.style.position = '';
-            touchDragItem.style.zIndex = '';
-            touchDragItem.style.width = ''; 
-            touchDragItem.style.height = '';
-            touchDragItem.style.background = '';
-            touchDragItem.style.border = '';
-            touchDragItem.style.borderRadius = '';
+            Object.assign(touchDragItem.style, {left:'', top:'', position:'', zIndex:'', width:'', height:'', background:'', border:'', borderRadius:''});
 
-            if (dropZone) {
-                placeItemInZone(touchDragItem, dropZone);
-            } else if (poolZone) {
-                returnToPool(touchDragItem);
-            } else {
-                if (originalParent && originalParent.classList.contains('chair-drop-zone')) {
-                    placeItemInZone(touchDragItem, originalParent);
-                } else {
-                    returnToPool(touchDragItem);
-                }
-            }
+            if (dropZone) placeItemInZone(touchDragItem, dropZone);
+            else if (poolZone) returnToPool(touchDragItem);
+            else if (originalParent && originalParent.classList.contains('chair-drop-zone')) placeItemInZone(touchDragItem, originalParent);
+            else returnToPool(touchDragItem);
+            
             touchDragItem = null;
         }
 
         function placeItemInZone(item, zone) {
-            if (zone.children.length > 0 && zone.children[0] !== item) {
-                const existing = zone.children[0];
-                returnToPool(existing);
-            }
-            if (item.parentElement.classList.contains('chair-drop-zone')) {
-                item.parentElement.classList.remove('has-item');
-            }
+            if (zone.children.length > 0 && zone.children[0] !== item) returnToPool(zone.children[0]);
+            if (item.parentElement.classList.contains('chair-drop-zone')) item.parentElement.classList.remove('has-item');
             zone.appendChild(item);
             zone.classList.add('has-item');
         }
 
         function returnToPool(item) {
-            if (item.parentElement.classList.contains('chair-drop-zone')) {
-                item.parentElement.classList.remove('has-item');
-            }
+            if (item.parentElement.classList.contains('chair-drop-zone')) item.parentElement.classList.remove('has-item');
             document.getElementById('chairs-pool').appendChild(item);
         }
+
+        // --- START ---
+        initGame();
+        setLanguage('ua'); // Default
+
     </script>
 </body>
 </html>

@@ -13,65 +13,52 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow-x: hidden; /* Прибираємо горизонтальну прокрутку сторінки */
+            overflow-x: hidden;
             
-            /* ЗАХИСТ: Глобальна заборона виділення та меню при довгому тапі */
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none; /* Safari */
-            -khtml-user-select: none; /* Konqueror HTML */
-            -moz-user-select: none; /* Old Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Chrome, Opera and Firefox */
+            /* ЗАХИСТ: Глобальна заборона виділення */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
-        /* Верхня частина: Сітка будівель */
+        /* --- ВЕРХНЯ ЧАСТИНА: СІТКА БУДІВЕЛЬ --- */
         #buildings-container {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 20px;
             display: grid;
-            /* АДАПТИВНІСТЬ: На ПК - авто, на мобільному - 1 колонка на всю ширину */
+            
+            /* DESKTOP */
+            padding: 20px;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
-            padding-bottom: 220px; /* Місце для нижньої панелі */
-        }
-
-        /* МЕДІА-ЗАПИТ ДЛЯ МОБІЛЬНИХ */
-        @media (max-width: 600px) {
-            #buildings-container {
-                padding: 10px; /* Менші відступи з боків */
-                grid-template-columns: 1fr; /* Одна колонка */
-                gap: 30px;
-            }
-            .card {
-                padding: 10px;
-            }
+            padding-bottom: 250px; 
         }
 
         .card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            /* DESKTOP */
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 15px;
         }
 
         .building-img {
             width: 100%;
             aspect-ratio: 16 / 10;
             object-fit: cover;
+            /* DESKTOP */
             border-radius: 8px;
             margin-bottom: 15px;
-            pointer-events: none; /* Заборона взаємодії з картинкою будівлі */
+            
+            pointer-events: none;
             -webkit-user-drag: none;
         }
 
-        /* Зона для перетягування крісла */
         .chair-drop-zone {
-            width: 100%;
             height: 180px;
             border: 2px dashed #ccc;
             border-radius: 8px;
@@ -81,23 +68,11 @@
             transition: background-color 0.3s, border-color 0.3s;
             background-color: #fafafa;
             margin-bottom: 15px;
-            position: relative; /* Важливо для JS */
-        }
-
-        .chair-drop-zone.drag-over {
-            background-color: #e3f2fd;
-            border-color: #2196f3;
-        }
-
-        .chair-drop-zone.has-item {
-            border-style: solid;
-            border-color: #4caf50;
-            background-color: #fff;
-        }
-
-        /* Стилі для поля вводу */
-        .style-input {
+            position: relative;
             width: 100%;
+        }
+
+        .style-input {
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
@@ -105,71 +80,147 @@
             box-sizing: border-box;
             text-align: center;
             background-color: #f9f9f9;
-            /* Дозволяємо вводити текст, незважаючи на глобальний user-select: none */
             -webkit-user-select: text;
             user-select: text;
+            width: 100%;
         }
-        
+
+        /* --- MOBILE ADAPTATION --- */
+        @media (max-width: 600px) {
+            #buildings-container {
+                padding: 0; 
+                gap: 0;
+                display: block; 
+                padding-bottom: 350px !important; 
+            }
+
+            .card {
+                border-radius: 0;
+                box-shadow: none;
+                border-bottom: 15px solid #e1e4e8;
+                padding: 0;
+                padding-bottom: 25px;
+                margin-bottom: 0;
+                width: 100%;
+            }
+
+            .building-img {
+                border-radius: 0;
+                margin-bottom: 20px;
+                width: 100%;
+            }
+
+            .chair-drop-zone, .style-input {
+                width: 92%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        .chair-drop-zone.drag-over {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .chair-drop-zone.has-item {
+            border-style: solid;
+            border-color: #4caf50;
+            background-color: #fff;
+        }
         .style-input:focus {
             outline: none;
             border-color: #2196f3;
             background-color: #fff;
         }
 
-        /* Нижня частина: Пул крісел */
+        /* --- НИЖНЯ ЧАСТИНА: ПУЛ КРІСЕЛ --- */
         #chairs-pool {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 180px; /* Трохи менше висота для економії місця */
+            height: 220px; 
+            
+            /* Дизайн панелі */
             background-color: #222;
+            
+            /* Відступи */
+            padding-top: 30px; /* Місце для "ручки" */
+            padding-bottom: 10px;
+            
             display: flex;
-            align-items: center;
-            overflow-x: auto;
-            padding: 10px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+            align-items: flex-start;
+            
+            overflow-x: auto; 
             z-index: 1000;
-            touch-action: pan-x; /* Дозволяє скролити тільки горизонтально */
+            box-sizing: border-box;
+            
+            /* Внутрішня тінь з боків, щоб натякнути на прокрутку */
+            box-shadow: inset 15px 0 15px -15px rgba(0,0,0,0.8), 
+                        inset -15px 0 15px -15px rgba(0,0,0,0.8),
+                        0 -5px 15px rgba(0,0,0,0.2); 
+        }
+
+        /* ДИЗАЙН: "GRIP HANDLE" (Ручка захоплення) */
+        #chairs-pool::before {
+            content: "";
+            position: fixed; /* Фіксуємо, щоб не скролилась */
+            bottom: 200px; /* Позиція зверху панелі */
+            left: 50%;
+            transform: translateX(-50%);
+            
+            /* Вигляд "пігулки" */
+            width: 50px;
+            height: 5px;
+            background-color: #555; /* Темно-сірий колір */
+            border-radius: 10px;
+            
+            pointer-events: none;
+            opacity: 0.8;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
         .chair-item {
             width: 130px;
             height: 130px;
-            min-width: 130px; /* Фіксований розмір, щоб не стискались */
+            min-width: 130px;
             margin: 0 10px;
+            /* Відступ зверху, щоб не перекривати "ручку" */
+            margin-top: 10px; 
+            
             cursor: grab;
             background-color: white;
             border-radius: 8px;
             padding: 5px;
             box-sizing: border-box;
             object-fit: contain;
-            /* ЗАХИСТ ЗОБРАЖЕНЬ */
+            
+            pointer-events: auto;
             -webkit-touch-callout: none;
-            pointer-events: auto; /* Дозволяємо кліки/тапи для скрипта */
         }
         
-        /* Клас, який додається, коли елемент тягнуть пальцем */
         .chair-item.dragging-mobile {
             position: fixed;
             z-index: 9999;
-            opacity: 0.8;
-            pointer-events: none; /* Щоб палець "бачив" елементи під картинкою */
+            opacity: 0.9;
+            pointer-events: none;
             width: 120px;
             height: 120px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transform: translate(-50%, -50%); /* Центруємо під пальцем */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 2px solid #2196f3;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            transform: translate(-50%, -50%);
         }
 
         #chairs-pool::-webkit-scrollbar {
-            height: 8px;
+            height: 6px; /* Тонший скрол */
         }
         #chairs-pool::-webkit-scrollbar-track {
-            background: #333;
+            background: #222;
         }
         #chairs-pool::-webkit-scrollbar-thumb {
-            background: #555; 
-            border-radius: 4px;
+            background: #444; 
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -218,7 +269,6 @@
             const dropZone = document.createElement('div');
             dropZone.className = 'chair-drop-zone';
             dropZone.id = `zone-${building.id}`;
-            // Desktop події
             dropZone.ondrop = (event) => drop(event, dropZone);
             dropZone.ondragover = allowDrop;
 
@@ -240,14 +290,13 @@
             img.id = chair.id;
             img.className = 'chair-item';
             img.draggable = true;
-            img.alt = ''; // Прибираємо назву при довгому тапі
+            img.alt = ''; 
             
-            // Desktop події
             img.ondragstart = drag;
             img.oncontextmenu = function() { return false; };
             img.onerror = function() { this.style.display = 'none'; };
 
-            // --- MOBILE TOUCH EVENTS (Custom Logic) ---
+            // Mobile Touch Events
             img.addEventListener('touchstart', handleTouchStart, {passive: false});
             img.addEventListener('touchmove', handleTouchMove, {passive: false});
             img.addEventListener('touchend', handleTouchEnd);
@@ -255,7 +304,7 @@
             chairsPool.appendChild(img);
         });
 
-        // --- ЛОГІКА DESKTOP (Миша) ---
+        // --- ЛОГІКА DESKTOP ---
         function allowDrop(ev) {
             ev.preventDefault();
             if (ev.target.classList.contains('chair-drop-zone')) {
@@ -276,7 +325,6 @@
             var data = ev.dataTransfer.getData("text");
             var draggedElement = document.getElementById(data);
             if (!draggedElement) return;
-            
             placeItemInZone(draggedElement, zone);
         }
         function dropToPool(ev) {
@@ -286,48 +334,56 @@
             if (draggedElement) returnToPool(draggedElement);
         }
 
-        // --- ЛОГІКА MOBILE (Палець) ---
+        // --- ЛОГІКА MOBILE ---
         let touchDragItem = null;
         let originalParent = null;
+        let startX = 0;
+        let startY = 0;
 
         function handleTouchStart(e) {
-            // Якщо ми скролимо пул (горизонтально), не починаємо перетягування
-            // Але якщо ми тягнемо вгору - починаємо.
-            // Для спрощення: довгий тап або явний рух.
-            // Тут реалізуємо: при торканні фіксуємо елемент.
             touchDragItem = e.target;
             originalParent = touchDragItem.parentElement;
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
         }
 
         function handleTouchMove(e) {
             if (!touchDragItem) return;
-
-            // Забороняємо скрол сторінки, поки тягнемо крісло
-            e.preventDefault(); 
-
             const touch = e.touches[0];
-            
-            // Додаємо клас для стилів "літаючого" елемента
+            const diffX = Math.abs(touch.clientX - startX);
+            const diffY = Math.abs(touch.clientY - startY);
+
             if (!touchDragItem.classList.contains('dragging-mobile')) {
-                touchDragItem.classList.add('dragging-mobile');
-                document.body.appendChild(touchDragItem); // Переносимо в body, щоб літав поверх усього
+                if (originalParent.id === 'chairs-pool' && diffX > diffY) {
+                    return; // Це горизонтальний скрол
+                }
+                if (diffY > 5) { // Вертикальний рух = перетягування
+                    touchDragItem.classList.add('dragging-mobile');
+                    document.body.appendChild(touchDragItem);
+                }
             }
 
-            // Рухаємо елемент за пальцем
-            touchDragItem.style.left = touch.clientX + 'px';
-            touchDragItem.style.top = touch.clientY + 'px';
+            if (touchDragItem.classList.contains('dragging-mobile')) {
+                e.preventDefault();
+                touchDragItem.style.left = touch.clientX + 'px';
+                touchDragItem.style.top = touch.clientY + 'px';
+            }
         }
 
         function handleTouchEnd(e) {
             if (!touchDragItem) return;
-            const touch = e.changedTouches[0];
+            
+            if (!touchDragItem.classList.contains('dragging-mobile')) {
+                touchDragItem = null;
+                return;
+            }
 
-            // На мить ховаємо елемент, щоб дізнатися, що ПІД ним
+            const touch = e.changedTouches[0];
             touchDragItem.style.display = 'none';
             let elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             touchDragItem.style.display = 'block';
 
-            // Шукаємо найближчу зону дропу
             let dropZone = elementBelow ? elementBelow.closest('.chair-drop-zone') : null;
             let poolZone = elementBelow ? elementBelow.closest('#chairs-pool') : null;
 
@@ -338,39 +394,32 @@
             touchDragItem.style.zIndex = '';
             touchDragItem.style.width = ''; 
             touchDragItem.style.height = '';
+            touchDragItem.style.background = '';
+            touchDragItem.style.border = '';
+            touchDragItem.style.borderRadius = '';
 
             if (dropZone) {
-                // Кинули в зону під будівлею
                 placeItemInZone(touchDragItem, dropZone);
             } else if (poolZone) {
-                // Кинули назад в пул
                 returnToPool(touchDragItem);
             } else {
-                // Кинули мимо - повертаємо звідки взяли
                 if (originalParent && originalParent.classList.contains('chair-drop-zone')) {
                     placeItemInZone(touchDragItem, originalParent);
                 } else {
                     returnToPool(touchDragItem);
                 }
             }
-
             touchDragItem = null;
-            originalParent = null;
         }
 
-        // --- ЗАГАЛЬНІ ФУНКЦІЇ РОЗМІЩЕННЯ ---
         function placeItemInZone(item, zone) {
-            // Якщо зона зайнята - міняємо місцями (повертаємо старе в пул)
             if (zone.children.length > 0 && zone.children[0] !== item) {
                 const existing = zone.children[0];
                 returnToPool(existing);
             }
-            
-            // Чистимо стилі зони
             if (item.parentElement.classList.contains('chair-drop-zone')) {
                 item.parentElement.classList.remove('has-item');
             }
-            
             zone.appendChild(item);
             zone.classList.add('has-item');
         }
@@ -381,7 +430,6 @@
             }
             document.getElementById('chairs-pool').appendChild(item);
         }
-
     </script>
 </body>
 </html>

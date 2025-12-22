@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Архітектурна головоломка</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            /* ЗАХИСТ: Вимикаємо виділення тексту/картинок */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Верхня частина: Сітка будівель */
+        #buildings-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: grid;
+            /* Ширина карток адаптивна, але не менше 450px */
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 30px;
+            padding-bottom: 220px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .building-img {
+            width: 100%;
+            /* ПРОПОРЦІЯ 16:10 */
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            
+            /* ЗАХИСТ: Картинка ігнорує мишку */
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Зона для перетягування крісла */
+        .chair-drop-zone {
+            width: 100%;
+            height: 180px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s, border-color 0.3s;
+            background-color: #fafafa;
+            margin-bottom: 15px;
+        }
+
+        .chair-drop-zone.drag-over {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .chair-drop-zone.has-item {
+            border-style: solid;
+            border-color: #4caf50;
+            background-color: #fff;
+        }
+
+        /* Стилі для поля вводу */
+        .style-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        
+        .style-input:focus {
+            outline: none;
+            border-color: #2196f3;
+            background-color: #fff;
+        }
+
+        /* Нижня частина: Пул крісел */
+        #chairs-pool {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background-color: #222;
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            padding: 10px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .chair-item {
+            min-width: 140px;
+            height: 140px;
+            margin: 0 10px;
+            cursor: grab;
+            background-color: white;
+            border-radius: 8px;
+            padding: 5px;
+            box-sizing: border-box;
+            transition: transform 0.2s;
+            object-fit: contain;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .chair-item:hover {
+            transform: scale(1.05);
+        }
+
+        .chair-item:active {
+            cursor: grabbing;
+        }
+
+        .chair-drop-zone .chair-item {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            object-fit: contain;
+        }
+        
+        #chairs-pool::-webkit-scrollbar {
+            height: 12px;
+        }
+        #chairs-pool::-webkit-scrollbar-track {
+            background: #333;
+        }
+        #chairs-pool::-webkit-scrollbar-thumb {
+            background: #555; 
+            border-radius: 6px;
+            border: 2px solid #333;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="buildings-container"></div>
+
+    <div id="chairs-pool" ondrop="dropToPool(event)" ondragover="allowDrop(event)"></div>
+
+    <script>
+        // --- НАЛАШТУВАННЯ ДАНИХ ---
+        const totalItems = 16;
+        const buildingsData = [];
+        const chairsData = [];
+
+        for (let i = 1; i <= totalItems; i++) {
+            buildingsData.push({ id: `A${i}`, src: `a${i}.jpg`, code: `A${i}` });
+            chairsData.push({ id: `C${i}`, src: `c${i}.png`, code: `C${i}` });
+        }
+
+        // --- ФУНКЦІЯ ПЕРЕМІШУВАННЯ ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        shuffleArray(buildingsData);
+        shuffleArray(chairsData);
+
+        // --- ГЕНЕРАЦІЯ HTML ---
+        const buildingsContainer = document.getElementById('buildings-container');
+        const chairsPool = document.getElementById('chairs-pool');
+
+        // 1. Картки будівель
+        buildingsData.forEach(building => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            // Фото (велике, 16:10, захищене)
+            const img = document.createElement('img');
+            img.src = building.src;
+            img.className = 'building-img';
+            img.alt = ''; 
+            img.onerror = function() { this.style.display = 'none'; };
+
+            // Зона для крісла
+            const dropZone = document.createElement('div');
+            dropZone.className = 'chair-drop-zone';
+            dropZone.id = `zone-${building.id}`;
+            dropZone.ondrop = (event) => drop(event, dropZone);
+            dropZone.ondragover = allowDrop;
+
+            // Поле вводу
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'style-input';
+            // Новий підпис для всіх
+            input.placeholder = "Вкажіть стиль, якщо знаєте";
+
+            card.appendChild(img);
+            card.appendChild(dropZone);
+            card.appendChild(input);
+            
+            buildingsContainer.appendChild(card);
+        });
+
+        // 2. Крісла
+        chairsData.forEach(chair => {
+            const img = document.createElement('img');
+            img.src = chair.src;
+            img.id = chair.id;
+            img.className = 'chair-item';
+            img.draggable = true;
+            img.ondragstart = drag;
+            img.oncontextmenu = function() { return false; };
+            img.onerror = function() { this.style.display = 'none'; };
+            
+            chairsPool.appendChild(img);
+        });
+
+        // --- ЛОГІКА DRAG AND DROP ---
+        function allowDrop(ev) {
+            ev.preventDefault();
+            if (ev.target.classList.contains('chair-drop-zone')) {
+                ev.target.classList.add('drag-over');
+            }
+        }
+
+        document.addEventListener('dragleave', (ev) => {
+            if (ev.target.classList.contains('chair-drop-zone')) {
+                ev.target.classList.remove('drag-over');
+            }
+        });
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev, zone) {
+            ev.preventDefault();
+            zone.classList.remove('drag-over');
+            
+            var data = ev.dataTransfer.getData("text");
+            var draggedElement = document.getElementById(data);
+
+            if (!draggedElement) return;
+
+            if (zone.children.length > 0) {
+                const existingChair = zone.children[0];
+                document.getElementById('chairs-pool').appendChild(existingChair);
+                zone.classList.remove('has-item');
+            }
+
+            zone.appendChild(draggedElement);
+            zone.classList.add('has-item');
+        }
+
+        function dropToPool(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var draggedElement = document.getElementById(data);
+            
+            if (!draggedElement) return;
+
+            if (draggedElement.parentElement.classList.contains('chair-drop-zone')) {
+                draggedElement.parentElement.classList.remove('has-item');
+            }
+
+            document.getElementById('chairs-pool').appendChild(draggedElement);
+        }
+    </script>
+</body>
+</html>

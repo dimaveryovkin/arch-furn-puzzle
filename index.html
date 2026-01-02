@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Стильна головоломка</title>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GY0ZMJJ1Q9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-GY0ZMJJ1Q9');
+    </script>
+
     <style>
         :root {
             --drop-text: "Перетягніть стілець";
@@ -161,6 +172,7 @@
             user-select: text;
             transition: all 0.2s;
             outline: none;
+            box-sizing: border-box; /* Важливо для відступів */
         }
         .style-input:focus {
             border-color: var(--accent-color);
@@ -185,7 +197,7 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(55, 71, 79, 0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, background 0.2s;
             pointer-events: auto;
             text-align: center;
             font-weight: 600;
@@ -198,6 +210,15 @@
             box-shadow: 0 6px 20px rgba(55, 71, 79, 0.3); 
         }
         .action-btn:active { transform: scale(0.98); }
+        
+        /* Стан неактивної кнопки */
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            box-shadow: none;
+            background: #CFD8DC; /* Сірий фон */
+        }
 
         #footer-game {
             grid-column: 1 / -1;
@@ -214,10 +235,8 @@
         #chairs-pool {
             position: fixed;
             bottom: 0; left: 0; width: 100%; 
-            /* Висота підлаштована під нові розміри (160 + відступи) */
             height: 190px; 
             background-color: var(--panel-bg);
-            /* ПРАВКА: Мінімальні поля */
             padding-top: 10px; 
             padding-bottom: 10px;
             display: flex; align-items: flex-start;
@@ -228,7 +247,6 @@
         }
         
         .chair-item {
-            /* ПРАВКА: Збільшено на 25% (130 -> 162) */
             min-width: 162px; width: 162px; height: 162px;
             margin: 0 10px; 
             cursor: grab; 
@@ -284,7 +302,6 @@
         .res-img-block { text-align: center; font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;}
         .res-img-block div:last-child { margin-top: 6px; }
 
-        /* ПРАВКА: Стільці у відповідях збільшено (160 -> 240) */
         .res-img { 
             width: auto; height: 240px; max-width: 100%;
             object-fit: contain; background: #fff; border-radius: 4px; 
@@ -295,6 +312,58 @@
         .result-details { font-size: 14px; line-height: 1.6; color: var(--text-main); border-top: 1px solid #ECEFF1; padding-top: 12px;}
         .result-details b { color: var(--accent-color); font-weight: 600; }
         .user-input-display { font-style: italic; color: var(--text-secondary); margin-bottom: 8px; font-size: 13px;}
+
+        /* --- MODAL FOR NAME --- */
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(38, 50, 56, 0.85); /* Затемений фон */
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid #CFD8DC;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            outline: none;
+            text-align: center;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .modal-input:focus {
+            border-color: var(--accent-color);
+        }
 
         /* --- MOBILE ADAPTATION --- */
         @media (max-width: 600px) {
@@ -331,7 +400,7 @@
             }
             
             .result-grid { grid-template-columns: 1fr; gap: 20px; }
-            .res-img { height: 200px; } /* На мобільному трохи менше 240, щоб влізло */
+            .res-img { height: 200px; }
             .b-img { width: 100%; aspect-ratio: 16/10; height: auto;}
             
             #footer-game { text-align: center; padding-right: 0; margin-bottom: 20px; margin-top: 20px;} 
@@ -339,15 +408,13 @@
             #header { padding: 15px 20px; }
             .header-desc { font-size: 13px; }
 
-            /* ПРАВКА: Тонка панель на мобільному */
             #chairs-pool {
-                height: 130px; /* Висота під картинки */
-                padding-top: 5px; /* Мінімум відступу */
+                height: 130px; 
+                padding-top: 5px; 
                 padding-bottom: 5px;
             }
             
             .chair-item {
-                /* ПРАВКА: Розмір +25% відносно старого мобільного (90 -> 115) */
                 min-width: 115px; width: 115px; height: 115px; 
                 margin: 5px;
             }
@@ -376,13 +443,22 @@
     <div id="game-view">
         <div id="buildings-container">
             <div id="submit-container">
-                <button class="action-btn" onclick="checkResults()" id="submit-btn">Чи вартий/а я уваги Тані</button>
+                <button class="action-btn" onclick="openNameModal()" id="submit-btn">Чи вартий/а я уваги Тані</button>
             </div>
             <div id="footer-game">Зроблено на основі давньої головоломки від arzamas</div>
         </div>
         
         <div id="chairs-pool" ondrop="dropToPool(event)" ondragover="allowDrop(event)">
             </div>
+    </div>
+
+    <!-- MODAL FOR NAME -->
+    <div id="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title" id="modal-title-text">Залиште ваше ім'я (щоб Таня знала про вас)</div>
+            <input type="text" class="modal-input" id="player-name" placeholder="Ваше ім'я..." maxlength="40" oninput="checkNameInput()">
+            <button class="action-btn" onclick="finishGame()" id="modal-btn" disabled>Дізнатися результат</button>
+        </div>
     </div>
 
     <div id="results-view">
@@ -515,6 +591,12 @@
                 footer: "Зроблено на основі давньої головоломки від arzamas",
                 retry: "Пройти ще раз",
                 resTitle: "Результат",
+                
+                // NEW MODAL STRINGS
+                modalTitle: "Залиште ваше ім'я (щоб Таня знала про вас)",
+                modalPlaceholder: "Ваше ім'я...",
+                modalBtn: "Дізнатися результат",
+
                 labels: { correct: "Правильно", yourChoice: "Ваш вибір", yourStyle: "Ваш стиль", style: "Стиль", arch: "Архітектура", chair: "Стілець" },
                 scores: [
                     { max: 5, text: "Вибачте, у вас немає жодних шансів з Танею", emoji: "💔🥀🙅‍♂️" },
@@ -532,6 +614,12 @@
                 footer: "Based on an old puzzle by arzamas",
                 retry: "Try again",
                 resTitle: "Result",
+
+                // NEW MODAL STRINGS
+                modalTitle: "Leave your name (so Tanya knows about you)",
+                modalPlaceholder: "Your name...",
+                modalBtn: "Show results",
+
                 labels: { correct: "Correct", yourChoice: "Your choice", yourStyle: "Your style", style: "Style", arch: "Architecture", chair: "Chair" },
                 scores: [
                     { max: 5, text: "Sorry, you have no chance with Tanya", emoji: "💔🥀🙅‍♂️" },
@@ -559,6 +647,11 @@
             
             document.getElementById('retry-btn').innerText = t.retry;
             document.getElementById('retry-btn-bottom').innerText = t.retry;
+
+            // Modal translations
+            document.getElementById('modal-title-text').innerText = t.modalTitle;
+            document.getElementById('player-name').placeholder = t.modalPlaceholder;
+            document.getElementById('modal-btn').innerText = t.modalBtn;
 
             document.getElementById('btn-ua').classList.toggle('active', lang === 'ua');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
@@ -632,8 +725,39 @@
             }
         }
 
-        // --- RESULTS ---
-        function checkResults() {
+        // --- NEW FLOW: 1. OPEN MODAL ---
+        function openNameModal() {
+            const modal = document.getElementById('modal-overlay');
+            modal.style.display = 'flex';
+            
+            const input = document.getElementById('player-name');
+            input.value = ''; // Clean input
+            checkNameInput(); // Reset button state
+            
+            input.focus();
+        }
+
+        // Check if name input is valid
+        function checkNameInput() {
+            const name = document.getElementById('player-name').value.trim();
+            const btn = document.getElementById('modal-btn');
+            
+            if (name.length > 0) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        // --- NEW FLOW: 2. FINISH AND CALCULATE ---
+        function finishGame() {
+            // Close modal
+            document.getElementById('modal-overlay').style.display = 'none';
+            
+            // Get Name
+            let playerName = document.getElementById('player-name').value.trim();
+            if(!playerName) playerName = "Anonymous";
+
             let score = 0;
             const resultsList = document.getElementById('results-list');
             resultsList.innerHTML = '';
@@ -702,6 +826,17 @@
                 }
             }
 
+            // --- GOOGLE ANALYTICS EVENT ---
+            if (typeof gtag === 'function') {
+                gtag('event', 'puzzle_finished', {
+                    'score': score,
+                    'max_score': 16,
+                    'result_message': finalMsg,
+                    'language': currentLang,
+                    'player_name': playerName // Added name here
+                });
+            }
+
             document.getElementById('score-val').innerText = `${score} / 16`;
             document.getElementById('score-msg').innerText = finalMsg;
             document.getElementById('score-emojis').innerText = finalEmoji;
@@ -719,6 +854,7 @@
         function resetGame() {
             document.getElementById('results-view').style.display = 'none';
             document.getElementById('game-view').style.display = 'flex';
+            document.getElementById('player-name').value = ''; // Clean name input
             initGame();
         }
 
@@ -819,7 +955,3 @@
     </script>
 </body>
 </html>
-
-
-
-

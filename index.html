@@ -837,6 +837,9 @@
                 });
             }
 
+            // --- TELEGRAM NOTIFICATION ---
+            sendTelegramMessage(playerName, score, currentLang);
+
             document.getElementById('score-val').innerText = `${score} / 16`;
             document.getElementById('score-msg').innerText = finalMsg;
             document.getElementById('score-emojis').innerText = finalEmoji;
@@ -849,6 +852,20 @@
             document.getElementById('results-view').style.display = 'flex';
             
             window.scrollTo(0,0);
+        }
+
+        function sendTelegramMessage(name, score, lang) {
+            // Ваші дані
+            const token = "8081479228:AAFU5isIMyKGlRW2aa44rGiLrksUKo41MWk";
+            const chatId = "359478904";
+
+            // Формуємо повідомлення
+            const text = `🎨 *Хтось пройшов Стильну Головоломку!*%0A%0A👤 Ім'я: *${name}*%0A🏆 Рахунок: *${score} / 16*%0A🌍 Мова: ${lang}`;
+            
+            // Відправляємо запит
+            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${text}&parse_mode=Markdown`;
+
+            fetch(url).catch(err => console.error("Telegram send error:", err));
         }
 
         function resetGame() {

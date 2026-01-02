@@ -172,7 +172,7 @@
             user-select: text;
             transition: all 0.2s;
             outline: none;
-            box-sizing: border-box; /* Важливо для відступів */
+            box-sizing: border-box;
         }
         .style-input:focus {
             border-color: var(--accent-color);
@@ -210,14 +210,12 @@
             box-shadow: 0 6px 20px rgba(55, 71, 79, 0.3); 
         }
         .action-btn:active { transform: scale(0.98); }
-        
-        /* Стан неактивної кнопки */
         .action-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             pointer-events: none;
             box-shadow: none;
-            background: #CFD8DC; /* Сірий фон */
+            background: #CFD8DC;
         }
 
         #footer-game {
@@ -231,7 +229,7 @@
             width: 100%;
         }
 
-        /* --- POOL (Compact Modern Drawer) --- */
+        /* --- POOL --- */
         #chairs-pool {
             position: fixed;
             bottom: 0; left: 0; width: 100%; 
@@ -318,7 +316,7 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(38, 50, 56, 0.85); /* Затемений фон */
+            background-color: rgba(38, 50, 56, 0.85); 
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -367,61 +365,20 @@
 
         /* --- MOBILE ADAPTATION --- */
         @media (max-width: 600px) {
-            #buildings-container { 
-                padding: 0; 
-                gap: 0; 
-                display: block; 
-                padding-bottom: 150px !important; 
-            }
-            
-            .card { 
-                border-radius: 0; 
-                border: none;
-                box-shadow: none; 
-                margin-bottom: 0; 
-                width: 100%; 
-                padding: 0 0 40px 0; 
-                background: #fff;
-            }
-            .card + .card { 
-                border-top: 12px solid #ECEFF1; 
-            }
-            
-            .building-img { 
-                border-radius: 0; 
-                margin-bottom: 24px; 
-                width: 100%; 
-                box-shadow: none; 
-            }
-            
-            .chair-drop-zone, .style-input { 
-                width: 90%; 
-                margin: 0 auto 16px auto; 
-            }
-            
+            #buildings-container { padding: 0; gap: 0; display: block; padding-bottom: 150px !important; }
+            .card { border-radius: 0; border: none; box-shadow: none; margin-bottom: 0; width: 100%; padding: 0 0 40px 0; background: #fff; }
+            .card + .card { border-top: 12px solid #ECEFF1; }
+            .building-img { border-radius: 0; margin-bottom: 24px; width: 100%; box-shadow: none; }
+            .chair-drop-zone, .style-input { width: 90%; margin: 0 auto 16px auto; }
             .result-grid { grid-template-columns: 1fr; gap: 20px; }
             .res-img { height: 200px; }
             .b-img { width: 100%; aspect-ratio: 16/10; height: auto;}
-            
             #footer-game { text-align: center; padding-right: 0; margin-bottom: 20px; margin-top: 20px;} 
-            
             #header { padding: 15px 20px; }
             .header-desc { font-size: 13px; }
-
-            #chairs-pool {
-                height: 130px; 
-                padding-top: 5px; 
-                padding-bottom: 5px;
-            }
-            
-            .chair-item {
-                min-width: 115px; width: 115px; height: 115px; 
-                margin: 5px;
-            }
-
-            .score-card.mobile-only {
-                display: block;
-            }
+            #chairs-pool { height: 130px; padding-top: 5px; padding-bottom: 5px; }
+            .chair-item { min-width: 115px; width: 115px; height: 115px; margin: 5px; }
+            .score-card.mobile-only { display: block; }
         }
     </style>
 </head>
@@ -447,9 +404,7 @@
             </div>
             <div id="footer-game">Зроблено на основі давньої головоломки від arzamas</div>
         </div>
-        
-        <div id="chairs-pool" ondrop="dropToPool(event)" ondragover="allowDrop(event)">
-            </div>
+        <div id="chairs-pool" ondrop="dropToPool(event)" ondragover="allowDrop(event)"></div>
     </div>
 
     <!-- MODAL FOR NAME -->
@@ -468,10 +423,7 @@
             <div class="score-emojis" id="score-emojis"></div>
             <button class="action-btn" onclick="resetGame()" id="retry-btn">Пройти ще раз</button>
         </div>
-        
-        <div id="results-list">
-            </div>
-
+        <div id="results-list"></div>
         <div class="score-card mobile-only">
             <div class="score-title" id="score-val-bottom">0 / 16</div>
             <div class="score-text" id="score-msg-bottom">...</div>
@@ -481,6 +433,13 @@
     </div>
 
     <script>
+        // ============================================
+        // БЕЗПЕЧНА ІНТЕГРАЦІЯ
+        // Токен сховано на сервері Google
+        // ============================================
+        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbyGyU_DTOWSj2RwAo227Wlhpp49bqF-o0wyRdKMELmPUWnDKt8-TEQ91KJ9DOZTkHET/exec";
+        // ============================================
+
         // --- DATASET ---
         const gameDB = [
             { id: 1, styleUA: "Готика", styleEN: "Gothic", 
@@ -488,91 +447,76 @@
               archEN: "Albrechtsburg Castle. Meissen, Germany, 1471–1500. Architect: Arnold von Westfalen",
               chairUA: "Крісло з різьбленого дуба. Шотландія, близько 1540 року", 
               chairEN: "Carved oak chair. Scotland, circa 1540" },
-            
             { id: 2, styleUA: "Ренесанс", styleEN: "Renaissance", 
               archUA: "Вілла Фарнезіна. Рим, 1506-1510 роки. Архітектор: Бальдассаре Перуцці", 
               archEN: "Villa Farnesina. Rome, 1506-1510. Architect: Baldassare Peruzzi",
               chairUA: "Крісло з різьбленого дуба. Італія близько 1550 року", 
               chairEN: "Carved oak chair. Italy, circa 1550" },
-            
             { id: 3, styleUA: "Бароко", styleEN: "Baroque", 
               archUA: "Замок Во-ле-Віконт. Мельон, Франція, 1658-1661 роки. Архітектор: Луї Лево", 
               archEN: "Château de Vaux-le-Vicomte. Maincy, France, 1658-1661. Architect: Louis Le Vau",
               chairUA: "Крісло з різьбленого горіха з оксамитовою оббивкою. Венеція, близько 1685-1710 років", 
               chairEN: "Carved walnut armchair with velvet upholstery. Venice, circa 1685-1710" },
-
             { id: 4, styleUA: "Рококо", styleEN: "Rococo", 
               archUA: "Павільйон Амалієнбург. Німфенбург, Німеччина 1734–1739 роки. Архітектор: Франсуа Кювільє", 
               archEN: "Amalienburg. Nymphenburg, Germany 1734–1739. Architect: François de Cuvilliés",
               chairUA: "Крісло з різьбленого бука з шовковою оббивкою. Париж, перша половина XVIII ст", 
               chairEN: "Carved beech armchair with silk upholstery. Paris, first half of the 18th century" },
-
             { id: 5, styleUA: "Неокласицизм", styleEN: "Neoclassicism", 
               archUA: "Кедлстон-хол, Дербішир, Великобританія, 1759-1762 роки. Архітектори: Джеймс Пейн, Метью Бреттінгем, Роберт Адам", 
               archEN: "Kedleston Hall, Derbyshire, UK, 1759-1762. Architects: James Paine, Matthew Brettingham, Robert Adam",
               chairUA: "Крісло з різьбленої берези із позолоченням та шовковою оббивкою. Франція близько 1780 року. Робота Жоржа Жакоба", 
               chairEN: "Gilt carved birch armchair with silk upholstery. France c. 1780. By Georges Jacob" },
-
             { id: 6, styleUA: "Ампір", styleEN: "Empire", 
               archUA: "Церква Сен-Мадлен, Париж, Франція, 1807-28 роки. Архітектор: П'єр-Олександр Віньон", 
               archEN: "La Madeleine, Paris, France, 1807-28. Architect: Pierre-Alexandre Vignon",
               chairUA: "Крісло з різьбленого горіха із позолоченням та оксамитовою оббивкою. Рим, близько 1800-1805 років", 
               chairEN: "Gilt carved walnut armchair with velvet upholstery. Rome, circa 1800-1805" },
-
             { id: 7, styleUA: "Національний романтизм", styleEN: "National Romanticism", 
               archUA: "Вілла під ялинами. Закопане, Польща, 1897 рік. Архітектор: Станіслав Віткевич", 
               archEN: "Villa Pod Jedlami. Zakopane, Poland, 1897. Architect: Stanisław Witkiewicz",
               chairUA: "Стілець із колекції Koti. Фінляндія, 1903 рік. Дизайн Еліеля Саарінена", 
               chairEN: "Chair from the Koti collection. Finland, 1903. Design by Eliel Saarinen" },
-
             { id: 8, styleUA: "Ар-нуво", styleEN: "Art Nouveau", 
               archUA: "Вілла Мажореля. Нансі, Франція, 1901-1902 роки. Архітектор: Анрі Саваж", 
               archEN: "Villa Majorelle. Nancy, France, 1901-1902. Architect: Henri Sauvage",
               chairUA: "Крісло з різьбленого горіха із сатиновою оббивкою. Нансі, Франція, близько 1899-1900 років. Робота Луї Мажореля", 
               chairEN: "Carved walnut armchair with satin upholstery. Nancy, France, circa 1899-1900. By Louis Majorelle" },
-
             { id: 9, styleUA: "Український архітектурний модерн", styleEN: "Ukrainian Architectural Modern", 
               archUA: "Будинок Полтавського губернського земства, Полтава, 1903–1908 роки. Архітектор: Василь Кричевський", 
               archEN: "Poltava Governorate Zemstvo building, Poltava, 1903–1908. Architect: Vasyl Krychevsky",
               chairUA: "Стілець Полтавського кустарного виробництва. Полтава, 1910-ті роки. Робота Володимира Черченко", 
               chairEN: "Chair of Poltava handicraft production. Poltava, circa 1910s. Design by Volodymyr Cherchenko" },
-
             { id: 10, styleUA: "Ар-деко", styleEN: "Art Deco", 
               archUA: "Вілла Ампан. Брюссель, 1930–1934 роки. Архітектор: Мішель Полак", 
               archEN: "Villa Empain. Brussels, 1930–1934. Architect: Michel Polak",
               chairUA: "Крісло із чорного дерева. Франція, близько 1929-1930 років. Дизайн Еміля Жака Рульманна", 
               chairEN: "Ebony armchair. France, circa 1929-1930. Design by Émile-Jacques Ruhlmann" },
-
             { id: 11, styleUA: "Ранній модернізм", styleEN: "Early Modernism", 
               archUA: "Вілла Савуа. Пуассі, Франція, 1928-1931 роки. Архітектор: Ле Корбюзьє", 
               archEN: "Villa Savoye. Poissy, France, 1928-1931. Architect: Le Corbusier",
               chairUA: "Стілець Wassily зі шкіри та металу. 1925 рік. Дизайн Марселя Бройєра", 
               chairEN: "Wassily chair made of leather and metal. 1925. Design by Marcel Breuer" },
-
             { id: 12, styleUA: "Пізній модернізм", styleEN: "Late Modernism", 
               archUA: "Резиденція канцлера ФРН. Бонн, Німеччина, 1963-1966 роки. Архітектор: Зеп Руф", 
               archEN: "Chancellor's Bungalow. Bonn, Germany, 1963-1966. Architect: Sep Ruf",
               chairUA: "Крісло GE-240 Cigar з тику та дуба зі знімними подушками. Данія, 1950-ті роки. Дизайн Ханса Вегнера", 
               chairEN: "GE-240 Cigar armchair in teak and oak. Denmark, 1950s. Design by Hans Wegner" },
-
             { id: 13, styleUA: "Ретрофутуризм", styleEN: "Retro-futurism", 
               archUA: "Серійний пластиковий будинок Futuro. Фінляндія, проєкт 1968 року. Архітектор: Матті Сууронен", 
               archEN: "Futuro plastic house. Finland, 1968 project. Architect: Matti Suuronen",
               chairUA: "Крісло Ball із алюмінію з текстильною оббивкою. 1973 рік. Дизайн Ееро Аарніо", 
               chairEN: "Ball Chair made of aluminum with textile upholstery. 1973. Design by Eero Aarnio" },
-
             { id: 14, styleUA: "Хай-тек", styleEN: "High-tech", 
               archUA: "ЖК «Альбіон Ріверсайд». Лондон, Великобританія, 2003 рік. Архітектор: Норман Фостер", 
               archEN: "Albion Riverside. London, UK, 2003. Architect: Norman Foster",
               chairUA: "Стілець DS-718 з металу та шкіри. Швейцарія Дизайн Клаудіо Белліні. Виробляється компанією De Sede", 
               chairEN: "DS-718 chair made of metal and leather. Switzerland. Design by Claudio Bellini. Produced by De Sede" },
-
             { id: 15, styleUA: "Постмодернізм", styleEN: "Postmodernism", 
               archUA: "Виноградники Clos Pegase. Каліфорнія, 1984-1987 роки. Архітектор: Майкл Грейвс", 
               archEN: "Clos Pegase Winery. California, 1984-1987. Architect: Michael Graves",
               chairUA: "Крісло Proust із різьбленого дерева з текстильною оббивкою. 1978 рік. Дизайн Алессандро Мендіні. Виробляється компанією Cappellini", 
               chairEN: "Proust armchair made of carved wood with textile upholstery. 1978. Design by Alessandro Mendini. Produced by Cappellini" },
-
             { id: 16, styleUA: "Деконструктивізм", styleEN: "Deconstructivism", 
               archUA: "«Танцювальний будинок». Прага, 1992-1996 роки. Архітектор: Френк Гері", 
               archEN: "Dancing House. Prague, 1992-1996. Architect: Frank Gehry",
@@ -591,12 +535,9 @@
                 footer: "Зроблено на основі давньої головоломки від arzamas",
                 retry: "Пройти ще раз",
                 resTitle: "Результат",
-                
-                // NEW MODAL STRINGS
                 modalTitle: "Залиште ваше ім'я (щоб Таня знала про вас)",
                 modalPlaceholder: "Ваше ім'я...",
                 modalBtn: "Дізнатися результат",
-
                 labels: { correct: "Правильно", yourChoice: "Ваш вибір", yourStyle: "Ваш стиль", style: "Стиль", arch: "Архітектура", chair: "Стілець" },
                 scores: [
                     { max: 5, text: "Вибачте, у вас немає жодних шансів з Танею", emoji: "💔🥀🙅‍♂️" },
@@ -614,12 +555,9 @@
                 footer: "Based on an old puzzle by arzamas",
                 retry: "Try again",
                 resTitle: "Result",
-
-                // NEW MODAL STRINGS
                 modalTitle: "Leave your name (so Tanya knows about you)",
                 modalPlaceholder: "Your name...",
                 modalBtn: "Show results",
-
                 labels: { correct: "Correct", yourChoice: "Your choice", yourStyle: "Your style", style: "Style", arch: "Architecture", chair: "Chair" },
                 scores: [
                     { max: 5, text: "Sorry, you have no chance with Tanya", emoji: "💔🥀🙅‍♂️" },
@@ -644,15 +582,11 @@
             document.querySelectorAll('.style-input').forEach(inp => inp.placeholder = t.placeholder);
             document.getElementById('submit-btn').innerText = t.submitBtn;
             document.getElementById('footer-game').innerText = t.footer;
-            
             document.getElementById('retry-btn').innerText = t.retry;
             document.getElementById('retry-btn-bottom').innerText = t.retry;
-
-            // Modal translations
             document.getElementById('modal-title-text').innerText = t.modalTitle;
             document.getElementById('player-name').placeholder = t.modalPlaceholder;
             document.getElementById('modal-btn').innerText = t.modalBtn;
-
             document.getElementById('btn-ua').classList.toggle('active', lang === 'ua');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
         }
@@ -731,30 +665,23 @@
             modal.style.display = 'flex';
             
             const input = document.getElementById('player-name');
-            input.value = ''; // Clean input
-            checkNameInput(); // Reset button state
+            input.value = ''; 
+            checkNameInput(); 
             
             input.focus();
         }
 
-        // Check if name input is valid
         function checkNameInput() {
             const name = document.getElementById('player-name').value.trim();
             const btn = document.getElementById('modal-btn');
-            
-            if (name.length > 0) {
-                btn.disabled = false;
-            } else {
-                btn.disabled = true;
-            }
+            if (name.length > 0) btn.disabled = false;
+            else btn.disabled = true;
         }
 
         // --- NEW FLOW: 2. FINISH AND CALCULATE ---
         function finishGame() {
-            // Close modal
             document.getElementById('modal-overlay').style.display = 'none';
             
-            // Get Name
             let playerName = document.getElementById('player-name').value.trim();
             if(!playerName) playerName = "Anonymous";
 
@@ -767,14 +694,12 @@
                 const zone = document.getElementById(`zone-A${i}`);
                 const input = document.getElementById(`input-A${i}`);
                 const db = gameDB.find(item => item.id === i);
-
                 let userChairSrc = null;
                 let isCorrect = false;
 
                 if (zone.children.length > 0) {
                     const chairId = zone.children[0].id; 
                     userChairSrc = zone.children[0].src;
-                    
                     if (chairId === `C${i}`) {
                         isCorrect = true;
                         score++;
@@ -783,7 +708,6 @@
 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = `result-item ${isCorrect ? 'correct' : 'incorrect'}`;
-
                 const styleName = currentLang === 'ua' ? db.styleUA : db.styleEN;
                 const archDesc = currentLang === 'ua' ? db.archUA : db.archEN;
                 const chairDesc = currentLang === 'ua' ? db.chairUA : db.chairEN;
@@ -792,13 +716,8 @@
                 itemDiv.innerHTML = `
                     <div class="result-header">${styleName}</div>
                     <div class="result-grid">
-                        <div class="res-img-block">
-                            <img src="a${i}.jpg" class="res-img b-img">
-                            </div>
-                        <div class="res-img-block">
-                            <img src="c${i}.png" class="res-img">
-                            <div>${t.labels.correct}</div>
-                        </div>
+                        <div class="res-img-block"><img src="a${i}.jpg" class="res-img b-img"></div>
+                        <div class="res-img-block"><img src="c${i}.png" class="res-img"><div>${t.labels.correct}</div></div>
                         <div class="res-img-block">
                             <div style="width:auto; height:240px; display:flex; align-items:center; justify-content:center; margin: 0 auto 8px auto;">
                                 ${userChairSrc ? `<img src="${userChairSrc}" class="res-img">` : `<span style="color:#D1D5DB; font-size:24px; border:1px dashed #D1D5DB; border-radius:6px; width:80px; height:80px; display:flex; align-items:center; justify-content:center;">?</span>`}
@@ -826,52 +745,46 @@
                 }
             }
 
-            // --- GOOGLE ANALYTICS EVENT ---
+            // 1. Send to Google Analytics
             if (typeof gtag === 'function') {
                 gtag('event', 'puzzle_finished', {
                     'score': score,
                     'max_score': 16,
                     'result_message': finalMsg,
                     'language': currentLang,
-                    'player_name': playerName // Added name here
+                    'player_name': playerName 
                 });
             }
 
-            // --- TELEGRAM NOTIFICATION ---
-            sendTelegramMessage(playerName, score, currentLang);
+            // 2. Send to Google Script Proxy (SECURE WAY)
+            sendToSecureProxy(playerName, score, currentLang);
 
             document.getElementById('score-val').innerText = `${score} / 16`;
             document.getElementById('score-msg').innerText = finalMsg;
             document.getElementById('score-emojis').innerText = finalEmoji;
-            
             document.getElementById('score-val-bottom').innerText = `${score} / 16`;
             document.getElementById('score-msg-bottom').innerText = finalMsg;
             document.getElementById('score-emojis-bottom').innerText = finalEmoji;
-            
             document.getElementById('game-view').style.display = 'none';
             document.getElementById('results-view').style.display = 'flex';
-            
             window.scrollTo(0,0);
         }
 
-        function sendTelegramMessage(name, score, lang) {
-            // Ваші дані
-            const token = "8081479228:AAFU5isIMyKGlRW2aa44rGiLrksUKo41MWk";
-            const chatId = "359478904";
+        function sendToSecureProxy(name, score, lang) {
+            if (!googleScriptUrl) return;
 
-            // Формуємо повідомлення
-            const text = `🎨 *Хтось пройшов Стильну Головоломку!*%0A%0A👤 Ім'я: *${name}*%0A🏆 Рахунок: *${score} / 16*%0A🌍 Мова: ${lang}`;
+            // Simple GET request to Google Script
+            // We use no-cors because we don't need to read the response, just send data
+            const finalUrl = `${googleScriptUrl}?name=${encodeURIComponent(name)}&score=${score}&lang=${lang}`;
             
-            // Відправляємо запит
-            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${text}&parse_mode=Markdown`;
-
-            fetch(url).catch(err => console.error("Telegram send error:", err));
+            fetch(finalUrl, { mode: 'no-cors' })
+                .catch(err => console.error("Proxy send error:", err));
         }
 
         function resetGame() {
             document.getElementById('results-view').style.display = 'none';
             document.getElementById('game-view').style.display = 'flex';
-            document.getElementById('player-name').value = ''; // Clean name input
+            document.getElementById('player-name').value = ''; 
             initGame();
         }
 
